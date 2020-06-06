@@ -1,4 +1,4 @@
-# Splash
+# splash
 Unix Splash Screen Workflow Tool
 
 ## Description
@@ -15,6 +15,7 @@ In this way, it can be used for programming custom interactive 3D widgets on you
 Tested on Ubuntu18 with Openbox.
 
 ## Usage
+sudo apt-get install libxxf86dga-dev
 
 ## License
 

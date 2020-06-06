@@ -7,5 +7,5 @@ in vec3 ex_FragPos;
 out vec4 fragColor;
 
 void main(void) {
-  fragColor = ex_Color; //Pass Color to Fragment
+  fragColor = ex_Color;
 }

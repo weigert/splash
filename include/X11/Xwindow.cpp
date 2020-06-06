@@ -1,23 +1,3 @@
-
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
-#include <math.h>
-
-#include <iostream>
-
-#include <sys/types.h>
-#include <time.h>
-
-#include <GL/gl.h>
-#include <GL/glx.h>
-#include <GL/glxext.h>
-#include <X11/Xatom.h>
-#include <X11/extensions/Xrender.h>
-#include <X11/Xutil.h>
-#include <X11/extensions/shape.h>
-#include <X11/extensions/Xfixes.h>
-
 using namespace std;
 
 struct MwmHints {
@@ -27,26 +7,6 @@ struct MwmHints {
     long input_mode;
     unsigned long status;
 };
-enum {
-    MWM_HINTS_FUNCTIONS = (1L << 0),
-    MWM_HINTS_DECORATIONS =  (1L << 1),
-
-    MWM_FUNC_ALL = (1L << 0),
-    MWM_FUNC_RESIZE = (1L << 1),
-    MWM_FUNC_MOVE = (1L << 2),
-    MWM_FUNC_MINIMIZE = (1L << 3),
-    MWM_FUNC_MAXIMIZE = (1L << 4),
-    MWM_FUNC_CLOSE = (1L << 5)
-};
-
-//#define USE_CHOOSE_FBCONFIG
-
-/*
-  Note: A splash is just an X11 window with special properties.
-
-  I couple it with an OpenGl context to allow for nice data rendering.
-  That is all.
-*/
 
 static void err(const char *_err){
   fprintf(stderr, "%s", _err);
@@ -54,19 +14,31 @@ static void err(const char *_err){
 }
 
 static int VisData[] = {
-GLX_RENDER_TYPE, GLX_RGBA_BIT,
-GLX_DRAWABLE_TYPE, GLX_WINDOW_BIT,
-GLX_DOUBLEBUFFER, True,
-GLX_RED_SIZE, 8,
-GLX_GREEN_SIZE, 8,
-GLX_BLUE_SIZE, 8,
-GLX_ALPHA_SIZE, 8,
-GLX_DEPTH_SIZE, 16,
-None
+  GLX_RENDER_TYPE, GLX_RGBA_BIT,
+  GLX_DRAWABLE_TYPE, GLX_WINDOW_BIT,
+  GLX_DOUBLEBUFFER, True,
+  GLX_RED_SIZE, 8,
+  GLX_GREEN_SIZE, 8,
+  GLX_BLUE_SIZE, 8,
+  GLX_ALPHA_SIZE, 8,
+  GLX_DEPTH_SIZE, 16,
+  None
 };
 
 class Splash{
 public:
+
+  Splash(){};
+
+  Splash(int _x, int _y, int _w, int _h){
+    x = _x; y = _y; w = _w; h = _h;
+  }
+
+  void setup(){
+    makeWindow("SPLASH");
+    makeContext();
+  }
+
   int Xscreen;
   Atom del_atom;
   Colormap cmap;
@@ -75,23 +47,34 @@ public:
   XRenderPictFormat *pict_format;
   GLXFBConfig *fbconfigs, fbconfig;
   GLXContext render_context;
-  Window Xroot, window_handle;
-  GLXWindow glX_window_handle;
-  int width, height;
+  Window Xroot, Xwindow;
+  GLXWindow gWindow;
 
-  bool input = false;
+  //Positional Data (default)
+  int x = 100, y = 100;
+  int w = 50, h = 50;
+
+  //Properties
+  bool interact = true;
+  bool background = false;
+  bool all = false;
 
   void makeWindow(string title);
   void makeContext();
 
   bool property(string type, string prop, int set);
   bool property(string type, unsigned long prop, int set);
+
+  ~Splash(){
+  	XDestroyWindow(Xdisplay, Xwindow);
+  	XCloseDisplay(Xdisplay);
+  };
 };
 
 bool Splash::property(string type, unsigned long prop, int set){
   Atom _type = XInternAtom(Xdisplay, type.c_str(), 1);
   if(_type == None) return false;
-  int attempt = XChangeProperty(Xdisplay, window_handle, _type, XA_CARDINAL, 32,
+  int attempt = XChangeProperty(Xdisplay, Xwindow, _type, XA_CARDINAL, 32,
                   PropModeReplace, (unsigned char *)&prop, 1);
   return (attempt != 0);
 }
@@ -115,7 +98,7 @@ bool Splash::property(string _type, string _prop, int set){
   XClientMessageEvent xclient;
   memset( &xclient, 0, sizeof (xclient) );
   xclient.type = ClientMessage;
-  xclient.window = window_handle;
+  xclient.window = Xwindow;
   xclient.message_type = type;
   xclient.format = 32;
   xclient.data.l[0] = set;
@@ -133,16 +116,14 @@ void Splash::makeWindow(string t){
 
   Xdisplay = XOpenDisplay(NULL);
 	if (!Xdisplay)
-		err("Couldn't connect to X server\n");
+    std::cout<<"Couldn't Connect to X-Server"<<std::endl;
 
 	Xscreen = DefaultScreen(Xdisplay);
 	Xroot = RootWindow(Xdisplay, Xscreen);
 
 	XEvent event;
-	int x,y, attr_mask;
-	XSizeHints hints;
+	int attr_mask;
 	XWMHints *startup_state;
-	XTextProperty textprop;
 	XSetWindowAttributes attr = {0,};
 
   int numfbconfigs;
@@ -164,7 +145,7 @@ void Splash::makeWindow(string t){
 	}
 
 	if(!fbconfig)
-		err("No matching FB config found");
+    std::cout<<"No Matching FB Config Found"<<std::endl;
 
 	cmap = XCreateColormap(Xdisplay, Xroot, visual->visual, AllocNone);
 
@@ -190,91 +171,63 @@ void Splash::makeWindow(string t){
 		CWBorderPixel|
 		CWEventMask | CWCursor;
 
-  int swidth =  DisplayWidth(Xdisplay, DefaultScreen(Xdisplay));
-  int sheight = DisplayHeight(Xdisplay, DefaultScreen(Xdisplay));
-
-  width = swidth;
-  height = sheight;
-
-  x = 0; y = 0;//(swidth-width)/2, y = (sheight-height)/2;
-
-	window_handle = XCreateWindow(	Xdisplay,
-					Xroot,
-					x, y, width, height,
-					0,
-					visual->depth,
-					InputOutput,
-					visual->visual,
+	Xwindow = XCreateWindow(Xdisplay, Xroot,
+					x, y, w, h, 0,
+          visual->depth, InputOutput, visual->visual,
 					attr_mask, &attr);
+	if( !Xwindow )
+    std::cout<<"Couldn't create window"<<std::endl;
+  gWindow = Xwindow;
 
-	if( !window_handle ) {
-		err("Couldn't create the window\n");
-	}
-
-  glX_window_handle = window_handle;
-
-  //Set the Window Title
+  XTextProperty textprop;
 	textprop.value = (unsigned char*)t.c_str();
 	textprop.encoding = XA_STRING;
 	textprop.format = 8;
 	textprop.nitems = t.length();
 
-	hints.x = x;
-	hints.y = y;
-	hints.width = width;
-	hints.height = height;
-	hints.flags = PPosition|USSize;
+  XSizeHints hints;
+	hints.flags = USPosition | USSize;
 
 	startup_state = XAllocWMHints();
 	startup_state->initial_state = NormalState;
 	startup_state->flags = StateHint;
 
-	XSetWMProperties(Xdisplay, window_handle, &textprop, &textprop,
-			NULL, 0,
-			&hints,
-			startup_state,
-			NULL);
+	XSetWMProperties(Xdisplay, Xwindow, &textprop, &textprop,
+			NULL, 0, &hints, startup_state, NULL);
 
 	XFree(startup_state);
 
-  //Visisble on all desktops
-  property("_NET_WM_DESKTOP", 0xFFFFFFFF, 1);
+  //Set all Desktops Pre-Map
+  if(all) property("_NET_WM_DESKTOP", 0xFFFFFFFF, 1);
 
-  //True Fullscreen - Call before Mapping
-  /*
-    Atom wm_state       = XInternAtom (Xdisplay, "_NET_WM_STATE", true );
-    Atom wm_fullscreen  = XInternAtom (Xdisplay, "_NET_WM_STATE_FULLSCREEN", true );
-    XChangeProperty(Xdisplay, window_handle, wm_state, XA_ATOM, 32,
-                    PropModeReplace, (unsigned char *)&wm_fullscreen, 1);
-  */
+  Atom a = XInternAtom(Xdisplay, "_NET_WM_WINDOW_TYPE", 0);
+  Atom b;
 
-  //Map
-  XMapWindow(Xdisplay, window_handle);
-  XIfEvent(Xdisplay, &event, WaitForMapNotify, (char*)&window_handle);
+  if(background) b = XInternAtom(Xdisplay, "_NET_WM_WINDOW_TYPE_DESKTOP", 0);
+  else b = XInternAtom(Xdisplay, "_NET_WM_WINDOW_TYPE_DOCK", 0);
+  XChangeProperty(Xdisplay, Xwindow, a, XA_ATOM, 32,
+          PropModeReplace, (unsigned char*)&b, 1);
 
+  XMapWindow(Xdisplay, Xwindow);
+  XIfEvent(Xdisplay, &event, WaitForMapNotify, (char*)&Xwindow);
   if ((del_atom = XInternAtom(Xdisplay, "WM_DELETE_WINDOW", 0)) != None) {
-    XSetWMProtocols(Xdisplay, window_handle, &del_atom, 1);
+    XSetWMProtocols(Xdisplay, Xwindow, &del_atom, 1);
   }
 
-  //No Border
-  Atom mwmHintsProperty = XInternAtom(Xdisplay, "_MOTIF_WM_HINTS", 0);
-  struct MwmHints _hints;
-  _hints.flags = MWM_HINTS_DECORATIONS;
-  _hints.decorations = 0;
-  XChangeProperty(Xdisplay, window_handle, mwmHintsProperty, mwmHintsProperty, 32,
-          PropModeReplace, (unsigned char *)&hints, 5);
-
-  //After Mapping
-  property("_NET_WM_STATE", "_NET_WM_STATE_BELOW", 1);           //_NET_WM_STATE_ABOVE
+  if(!background)
+    property("_NET_WM_STATE", "_NET_WM_STATE_ABOVE", 1);
+  else
+    property("_NET_WM_STATE", "_NET_WM_STATE_BELOW", 1);
   property("_NET_WM_STATE", "_NET_WM_STATE_SKIP_TASKBAR", 1);    //Does not appear in Alt+Tab
   property("_NET_WM_STATE", "_NET_WM_STATE_SKIP_PAGER", 1);
 
   //No Inputs
-  /*
-  XRectangle rect;
-  XserverRegion region = XFixesCreateRegion(Xdisplay, &rect, 1);
-  XFixesSetWindowShapeRegion(Xdisplay, window_handle, ShapeInput, 0, 0, region);
-  XFixesDestroyRegion(Xdisplay, region); */
+  if(!interact){
+    XRectangle rect;
+    XserverRegion region = XFixesCreateRegion(Xdisplay, &rect, 1);
+    XFixesSetWindowShapeRegion(Xdisplay, Xwindow, ShapeInput, 0, 0, region);
+    XFixesDestroyRegion(Xdisplay, region);
+  }
 }
 
 void Splash::makeContext(){
@@ -286,6 +239,6 @@ void Splash::makeContext(){
   if (!render_context)
     err("Failed to create a GL context\n");
 
-	if (!glXMakeContextCurrent(Xdisplay, glX_window_handle, glX_window_handle, render_context))
+	if (!glXMakeContextCurrent(Xdisplay, gWindow, gWindow, render_context))
 		err("glXMakeCurrent failed for window\n");
 }

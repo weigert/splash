@@ -21,8 +21,10 @@ namespace event {
   	while (XPending(s.Xdisplay)){
   		XNextEvent(s.Xdisplay, &event);
   		switch (event.type){
-        /*
+
+/*
     		case ClientMessage:
+
     			if (event.xclient.data.l[0] == s.del_atom)
     				return false;
             break;
@@ -49,8 +51,8 @@ namespace event {
             break;
     		case ConfigureNotify:
       			xc = &(event.xconfigure);
-      			s.width = xc->width;
-      			s.height = xc->height;
+      			s.w = xc->width;
+      			s.h = xc->height;
       			break;
   		}
   	}
