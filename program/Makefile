@@ -12,4 +12,8 @@ img:
 	@$(CC) source/img/img.cpp $(CFLAGS) $(LFLAGS) $(LINK) -o img
 	mv img ~/.config/splash/exec/img
 
+gif:
+	@$(CC) source/gif/gif.cpp $(CFLAGS) $(LFLAGS) -lgif $(LINK) -o gif
+	mv gif ~/.config/splash/exec/gif
+
 all: fidget img

@@ -30,6 +30,10 @@ Splash requires specification of an execution mode.
       img       Display .png image
       <data>:   Image file name
 
+      gif       Display .gif image
+      <data>:   GIF file name
+      Note:     Only works for full replacing gifs!
+
     Options:
 
       -p [x y w h]  Position Splash Quad
@@ -122,7 +126,6 @@ If there is a desire for more detailed information on how to build a custom visu
   - Plotting methods
   - .obj file load and display
   - Particle system
-  - GIF display
 - Dynamic data streams by active pipe listening
 
 ### Why?
