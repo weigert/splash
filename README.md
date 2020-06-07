@@ -12,6 +12,8 @@ splash transforms your entire desktop into a 2D / 3D canvas, for dynamic data or
 
 ![fidget.gif](https://github.com/weigert/splash/blob/master/screenshots/fidget.gif)
 
+This was originally written because I wanted to have a custom "splash screen" like those fancy, super expensive software packages have when starting up, with transparency and everything. Now it supports a full OpenGL context.
+
 ## Usage
 
 Splash requires specification of an execution mode.
