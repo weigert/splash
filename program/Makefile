@@ -1,6 +1,6 @@
 #Visualization Program Compilation!
 CC = g++ -std=c++17
-CFLAGS = -Wfatal-errors -O
+CFLAGS = -O -w
 LFLAGS = -I/usr/local/include -L/usr/local/lib -shared -fPIC
 LINK = -lX11 -ldl -lXfixes -lXrender -lSDL2 -lSDL2_image -lGL -lGLEW -lboost_system -lboost_filesystem
 
@@ -16,4 +16,4 @@ gif:
 	@$(CC) source/gif/gif.cpp $(CFLAGS) $(LFLAGS) -lgif $(LINK) -o gif
 	mv gif ~/.config/splash/exec/gif
 
-all: fidget img
+all: fidget img gif
