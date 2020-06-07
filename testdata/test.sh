@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
+#Splash Example Commands
 
-#Example Scripts
-
-echo "smb.gif" | splash gif -p 100 100 600 400 --bg --ni
+#Display Raw Gif in Background
+echo "smb.gif" | splash gif -p 660 340 600 400 --bg --ni

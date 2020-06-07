@@ -10,7 +10,13 @@ splash is a generic tool that provides a command-line interface for rendering no
 
 splash transforms your entire desktop into a 2D / 3D canvas, for dynamic data or simple static overlays that can interact with your mouse and keyboard and trigger commands.
 
+![smbsplash.gif](https://github.com/weigert/splash/blob/master/screenshots/smbsplash.gif)
+
+Example of splash displaying an animated GIF on the desktop background.
+
 ![fidget.gif](https://github.com/weigert/splash/blob/master/screenshots/fidget.gif)
+
+Example of splash displaying a full 3D OpenGL application (albeit a very basic one) with user interaction.
 
 This was originally written because I wanted to have a custom "splash screen" like those fancy, super expensive software packages have when starting up, with transparency and everything. Now it supports a full OpenGL context.
 
