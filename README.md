@@ -3,7 +3,7 @@ Unix Splash Screen Tool
 
 Made in C++
 
-Tested on Ubuntu18 with Openbox
+see below for distro / DE compatbility
 
 ## Description
 splash is a generic tool that provides a command-line interface for rendering non-windowed raw data directly onto your desktop environment.
@@ -93,6 +93,23 @@ If you wish to compile manually, use the makefiles in `splash/Makefile` and `pro
 
 
 Note that splash is separate from the actual execution modes. Execution modes are compiled separately (linked at runtime by splash).
+
+### Compabitibility
+
+This is just from some basic tests I can run on my computer. If you can compile / test on other distros and DEs, please open an issue so I can add it here.
+
+Distros:
+
+        Ubuntu 18           Compilation work
+        Arch / Manjaro      Compilation incomplete
+
+Desktop Environments:
+
+        Gnome               Works fully
+        Openbox             Works fully
+        i3                  Broken
+        i3-gaps             Not tested
+        bspwn               Not tested
 
 ## Customization & How it Works
 
