@@ -1,5 +1,8 @@
+#include <iostream>
 
 namespace logger{
+  bool verbose = false;
+  bool debug = true;
 
   template <typename T>
   void raw(T m){
@@ -12,11 +15,18 @@ namespace logger{
     raw(r...);
   }
 
-  bool verbose = false;
-  bool error = true;
-  void err(std::string e){
-    if(!error) return;
-    std::cout<<"Error: "<<e<<std::endl;
+  template <typename T>
+  void err(T m){
+    if(!debug) return;
+    std::cout<<"Error: ";
+    raw(m);
+  }
+
+  template <typename T, typename... Types>
+  void err(T m, Types... r){
+    if(!debug) return;
+    std::cout<<"Error: ";
+    raw(m, r...);
   }
 
   template <typename T>

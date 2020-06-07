@@ -1,9 +1,33 @@
 class Shader{
 public:
-  template<typename... Args>
   Shader(slist shaders, slist in){
     program = glCreateProgram();        //Generate Shader
     setup(shaders);                     //Add Individual Shaders
+    for(auto &n : in)                   //Add all Attributes of Shader
+      glBindAttribLocation(program, &n - in.begin(), n.c_str());
+    link();                             //Link the shader program!
+  }
+
+  Shader(slist shaders, slist in, bool source){
+    program = glCreateProgram();        //Generate Shader
+
+    std::vector<std::string> _src = shaders;
+
+    char* src;
+    int32_t size;
+
+    vertexShader = glCreateShader(GL_VERTEX_SHADER);
+    src = const_cast<char*>(_src[0].c_str());
+    size = _src[0].length();
+    glShaderSource(vertexShader, 1, &src, &size);
+    compile(vertexShader);
+
+    fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
+    src = const_cast<char*>(_src[1].c_str());
+    size = _src[1].length();
+    glShaderSource(fragmentShader, 1, &src, &size);
+    compile(fragmentShader);
+
     for(auto &n : in)                   //Add all Attributes of Shader
       glBindAttribLocation(program, &n - in.begin(), n.c_str());
     link();                             //Link the shader program!

@@ -1,6 +1,6 @@
 OBJS = splash.cpp
 
-TINYLINK = -lX11 -lXfixes -lXrender -lSDL2 -lnoise -lSDL2_image -lGL -lGLEW -lboost_system -lboost_filesystem
+TINYLINK = -lX11 -ldl -lXfixes -lXrender -lSDL2 -lnoise -lSDL2_image -lGL -lGLEW -lboost_system -lboost_filesystem
 
 CC = g++ -std=c++17
 COMPILER_FLAGS = -Wfatal-errors -O

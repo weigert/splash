@@ -154,7 +154,7 @@ public:
     update();                   //Update VAO / VBO / IBO
   }
 
-  void render(GLenum mode = GL_TRIANGLES){
+  void render(GLenum mode = GL_TRIANGLES) const{
     glBindVertexArray(vao);
     if(indexed){
       glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);

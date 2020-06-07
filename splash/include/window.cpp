@@ -1,4 +1,23 @@
+#include <GL/glew.h>
+
+#include <glm/glm.hpp>
+#include "glm/gtc/matrix_transform.hpp"
+
+#include <GL/gl.h>
+#include <GL/glx.h>
+#include <GL/glxext.h>
+
+#include <X11/Xatom.h>
+#include <X11/extensions/Xrender.h>
+#include <X11/Xutil.h>
+#include <X11/extensions/shape.h>
+#include <X11/extensions/Xfixes.h>
+
 using namespace std;
+
+namespace event {
+  bool active = true;
+}
 
 struct MwmHints {
     unsigned long flags;
@@ -30,13 +49,23 @@ public:
 
   Splash(){};
 
-  Splash(int _x, int _y, int _w, int _h){
-    x = _x; y = _y; w = _w; h = _h;
-  }
+  Splash(parse::data in):
+  x{in.x}, y{in.y}, w{in.w}, h{in.h},
+  interact{in.interact}, background{in.bg},
+  all{in.all}
+  { setup(); }
 
   void setup(){
     makeWindow("SPLASH");
     makeContext();
+
+    glewExperimental = GL_TRUE;     //Launch GLEW
+    glewInit();
+
+    //Options
+    glLineWidth(2.0);
+    glViewport(0, 0, 1920, 1080);
+    glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
   }
 
   int Xscreen;
@@ -69,6 +98,9 @@ public:
   	XDestroyWindow(Xdisplay, Xwindow);
   	XCloseDisplay(Xdisplay);
   };
+
+  template<typename F, typename... Args>
+  void render(F function, Args&&... args);
 };
 
 bool Splash::property(string type, unsigned long prop, int set){
@@ -241,4 +273,15 @@ void Splash::makeContext(){
 
 	if (!glXMakeContextCurrent(Xdisplay, gWindow, gWindow, render_context))
 		err("glXMakeCurrent failed for window\n");
+}
+
+template<typename F, typename... Args>
+void Splash::render(F function, Args&&... args){
+
+  while (event::active) {
+
+    function(args...);
+
+  }
+
 }

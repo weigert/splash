@@ -1,9 +1,9 @@
 class Image : public Program {
 public:
-  Image(std::string s){
+  Image(svec* s):Program(s){
 
     shader = new Shader({"program/image/image.vs", "program/image/image.fs"}, {"in_Quad, in_Tex"});
-    tex = new Texture(image::load(s));
+    tex = new Texture(image::load(data->back()));
 
     pipeline = [&](){
 

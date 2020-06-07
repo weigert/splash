@@ -4,17 +4,17 @@ namespace parse{
   struct data{
 
     bool test = false;  //Test Configuration File
-    bool verbose = false;
     bool bg = false;    //Background / Foreground
     bool pdata = false;
-    int x, y, w, h;     //Position Data
+    int x = 0, y = 0,
+    w = 1920, h = 1080;     //Position Data
     bool timeout = false;
     int t = -1;          //Timeout
     bool interact = true;
     bool all = false;
 
-    bool inputfile = false;
-    std::string file;   //Filename
+    bool program = false;
+    std::string prog;
 
   } in;
 
@@ -28,7 +28,7 @@ namespace parse{
     //Flag Arguments
 
     if(arg == "--t") in.test = true;
-    if(arg == "--v") in.verbose = true;
+    if(arg == "--v") logger::verbose = true;
     if(arg == "--bg")   in.bg = true;
     if(arg == "--fg")   in.bg = false; //(default)
     if(arg == "--ni")   in.interact = false; //(default)
@@ -59,11 +59,10 @@ namespace parse{
 
     if(arg == "-m"){
       if(ac - n > 1){ //Sufficient Args
-        in.inputfile = true;
-        in.file = std::string(as[n+1]);
+        in.program = true;
+        in.prog = std::string(as[n+1]);
         k++;
       }
-      else std::cout<<"Please specify a filename"<<std::endl;
     }
 
     input(n+k, ac, as);
@@ -71,6 +70,10 @@ namespace parse{
 
   //Master Fetch
   void input(int ac, char* as[]){
-    input(0, ac, as);
+    if(ac < 2) return;
+    in.prog = std::string(as[1]);
+    in.program = true;
+    input(2, ac, as);
   }
+
 };

@@ -1,0 +1,33 @@
+
+<!--
+Splash Configuration File
+
+Every program has its own default settings.
+
+You can specify a program structure...
+you can also specify default color schemes, etc.
+-->
+
+<splash>
+
+  <visual>
+    <linewidth>2.0</linewidth>
+    <clearcolor>1.0, 1.0, 1.0, 1.0</clearcolor>
+  </visual>
+
+  <programs>
+    <program name="png">
+    </program>
+    <program name="gif">
+    </program>
+    <program name="fidget">
+      <position>
+        <x>0</x>
+        <y>0</y>
+        <w>1920</w>
+        <h>1080</h>
+      </position>
+    </program>
+  </programs>
+
+</splash>

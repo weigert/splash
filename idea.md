@@ -20,9 +20,8 @@ Options:
 Usage:
   1. Pipe data into splash, e.g. a list of filenames, numbers, etc.
   2. Specify a visualization program
-  3. Specify
-  4. Set position and size of the splash
-  5. (Optional) set other flags and options
+  3. Set position and size of the splash
+  4. (Optional) set other flags and options
 
 To-Do:
   - Proper Modularization Concept for Visualization Programs

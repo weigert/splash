@@ -1,22 +1,25 @@
 # splash
-Unix Splash Screen Workflow Tool
+Unix Splash Screen Workflow Tool - WIP
 
 ## Description
-Splash is an interface for piping data
+Splash provides a command-line interface for rendering raw-data directly onto your desktop.
 
-## Structure
-Splash creates a borderless, backgroundless X11 window with an OpenGL context.
+It creates an X11-Window with an OpenGL context, as well as some example shader programs for rendering the data.
 
-Piping splash data will allow splash to visualize the data dynamically in 3D,
-with possibility for interaction and on-desktop data visualization.
-
-In this way, it can be used for programming custom interactive 3D widgets on your desktop.
+It allows you to place the OpenGL renderer anywhere on your screen for nice visual effects.
 
 Tested on Ubuntu18 with Openbox.
 
-## Usage
-sudo apt-get install libxxf86dga-dev
+Made in C++
+
+## To Do
+Currently, I am still working on proper modularization of the visualization programs, as well as the universal piping of data.
 
 ## License
 
 MIT License
+
+
+## Interesting Reads
+https://www.linuxjournal.com/article/3687
+https://www.tldp.org/HOWTO/html_single/C++-dlopen/
