@@ -16,17 +16,33 @@ namespace logger{
   }
 
   template <typename T>
-  void err(T m){
-    if(!debug) return;
+  bool err(T m){
+    if(!debug) return false;
     std::cout<<"Error: ";
     raw(m);
+    return false;
   }
 
   template <typename T, typename... Types>
-  void err(T m, Types... r){
-    if(!debug) return;
+  bool err(T m, Types... r){
+    if(!debug) return false;
     std::cout<<"Error: ";
     raw(m, r...);
+    return false;
+  }
+
+  template <typename T>
+  void fatal(T m){
+    std::cout<<"Fatal Error: ";
+    raw(m);
+    exit(0);
+  }
+
+  template <typename T, typename... Types>
+  void fatal(T m, Types... r){
+    std::cout<<"Fatal Error: ";
+    raw(m, r...);
+    exit(0);
   }
 
   template <typename T>

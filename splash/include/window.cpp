@@ -19,31 +19,6 @@ namespace event {
   bool active = true;
 }
 
-struct MwmHints {
-    unsigned long flags;
-    unsigned long functions;
-    unsigned long decorations;
-    long input_mode;
-    unsigned long status;
-};
-
-static void err(const char *_err){
-  fprintf(stderr, "%s", _err);
-  exit(EXIT_FAILURE);
-}
-
-static int VisData[] = {
-  GLX_RENDER_TYPE, GLX_RGBA_BIT,
-  GLX_DRAWABLE_TYPE, GLX_WINDOW_BIT,
-  GLX_DOUBLEBUFFER, True,
-  GLX_RED_SIZE, 8,
-  GLX_GREEN_SIZE, 8,
-  GLX_BLUE_SIZE, 8,
-  GLX_ALPHA_SIZE, 8,
-  GLX_DEPTH_SIZE, 16,
-  None
-};
-
 class Splash{
 public:
 
@@ -68,16 +43,12 @@ public:
     glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
   }
 
-  int Xscreen;
-  Atom del_atom;
-  Colormap cmap;
   Display *Xdisplay;
-  XVisualInfo *visual;
-  XRenderPictFormat *pict_format;
-  GLXFBConfig *fbconfigs, fbconfig;
-  GLXContext render_context;
   Window Xroot, Xwindow;
   GLXWindow gWindow;
+
+  GLXFBConfig fbconfig;
+  GLXContext render_context;
 
   //Positional Data (default)
   int x = 100, y = 100;
@@ -98,9 +69,6 @@ public:
   	XDestroyWindow(Xdisplay, Xwindow);
   	XCloseDisplay(Xdisplay);
   };
-
-  template<typename F, typename... Args>
-  void render(F function, Args&&... args);
 };
 
 bool Splash::property(string type, unsigned long prop, int set){
@@ -118,14 +86,10 @@ static Bool WaitForMapNotify(Display *d, XEvent *e, char *arg){
 bool Splash::property(string _type, string _prop, int set){
   Atom type = XInternAtom( Xdisplay, _type.c_str(), 1 );
   Atom prop = XInternAtom( Xdisplay, _prop.c_str(), 1 );
-  if(type == None){
-    std::cout<<"Failed to find atom "<<_type<<std::endl;
-    return false;
-  }
-  if(prop == None){
-    std::cout<<"Failed to find atom "<<_prop<<std::endl;
-    return false;
-  }
+  if(type == None)
+    return logger::err("Failed to find atom", _type);
+  if(prop == None)
+    return logger::err("Failed to find atom", _prop);
 
   XClientMessageEvent xclient;
   memset( &xclient, 0, sizeof (xclient) );
@@ -148,40 +112,40 @@ void Splash::makeWindow(string t){
 
   Xdisplay = XOpenDisplay(NULL);
 	if (!Xdisplay)
-    std::cout<<"Couldn't Connect to X-Server"<<std::endl;
+    logger::fatal("Couldn't connect to X server");
 
-	Xscreen = DefaultScreen(Xdisplay);
+	int Xscreen = DefaultScreen(Xdisplay);
 	Xroot = RootWindow(Xdisplay, Xscreen);
 
-	XEvent event;
-	int attr_mask;
-	XWMHints *startup_state;
-	XSetWindowAttributes attr = {0,};
-
-  int numfbconfigs;
-	fbconfigs = glXChooseFBConfig(Xdisplay, Xscreen, VisData, &numfbconfigs);
+  const int vdata[] = {
+    GLX_RENDER_TYPE, GLX_RGBA_BIT, GLX_DRAWABLE_TYPE, GLX_WINDOW_BIT, GLX_DOUBLEBUFFER, True,
+    GLX_RED_SIZE, 8, GLX_GREEN_SIZE, 8, GLX_BLUE_SIZE, 8, GLX_ALPHA_SIZE, 8, GLX_DEPTH_SIZE, 16,
+    None
+  };
 	fbconfig = 0;
-	for(int i = 0; i < numfbconfigs; i++) {
+  int nfbcfgs;
+  GLXFBConfig *fbconfigs = glXChooseFBConfig(Xdisplay, Xscreen, vdata, &nfbcfgs);
+  XVisualInfo* visual;
+  XRenderPictFormat * pformat;
+	for(int i = 0; i < nfbcfgs; i++) {
 		visual = (XVisualInfo*) glXGetVisualFromFBConfig(Xdisplay, fbconfigs[i]);
 		if(!visual)
 			continue;
 
-		pict_format = XRenderFindVisualFormat(Xdisplay, visual->visual);
-		if(!pict_format)
+		pformat = XRenderFindVisualFormat(Xdisplay, visual->visual);
+		if(!pformat)
 			continue;
 
 		fbconfig = fbconfigs[i];
-		if(pict_format->direct.alphaMask > 0) {
+		if(pformat->direct.alphaMask > 0) {
 			break;
 		}
 	}
 
-	if(!fbconfig)
-    std::cout<<"No Matching FB Config Found"<<std::endl;
+	if(!fbconfig) logger::fatal("No matching FB config found");
 
-	cmap = XCreateColormap(Xdisplay, Xroot, visual->visual, AllocNone);
-
-	attr.colormap = cmap;
+  XSetWindowAttributes attr = {0,};
+	attr.colormap = XCreateColormap(Xdisplay, Xroot, visual->visual, AllocNone);
 	attr.background_pixmap = None;
 	attr.border_pixmap = None;
 	attr.border_pixel = 0;
@@ -197,18 +161,13 @@ void Splash::makeWindow(string t){
 		KeyPressMask |
 		KeyReleaseMask;
 
-	attr_mask =
-		CWBackPixmap|
-		CWColormap|
-		CWBorderPixel|
-		CWEventMask | CWCursor;
-
+  int attr_mask = CWBackPixmap | CWColormap | CWBorderPixel | CWEventMask | CWCursor;
 	Xwindow = XCreateWindow(Xdisplay, Xroot,
 					x, y, w, h, 0,
           visual->depth, InputOutput, visual->visual,
 					attr_mask, &attr);
 	if( !Xwindow )
-    std::cout<<"Couldn't create window"<<std::endl;
+    logger::fatal("Couldn't create window");
   gWindow = Xwindow;
 
   XTextProperty textprop;
@@ -220,13 +179,11 @@ void Splash::makeWindow(string t){
   XSizeHints hints;
 	hints.flags = USPosition | USSize;
 
-	startup_state = XAllocWMHints();
+  XWMHints *startup_state = XAllocWMHints();
 	startup_state->initial_state = NormalState;
 	startup_state->flags = StateHint;
-
 	XSetWMProperties(Xdisplay, Xwindow, &textprop, &textprop,
 			NULL, 0, &hints, startup_state, NULL);
-
 	XFree(startup_state);
 
   //Set all Desktops Pre-Map
@@ -241,10 +198,6 @@ void Splash::makeWindow(string t){
           PropModeReplace, (unsigned char*)&b, 1);
 
   XMapWindow(Xdisplay, Xwindow);
-  XIfEvent(Xdisplay, &event, WaitForMapNotify, (char*)&Xwindow);
-  if ((del_atom = XInternAtom(Xdisplay, "WM_DELETE_WINDOW", 0)) != None) {
-    XSetWMProtocols(Xdisplay, Xwindow, &del_atom, 1);
-  }
 
   if(!background)
     property("_NET_WM_STATE", "_NET_WM_STATE_ABOVE", 1);
@@ -265,23 +218,12 @@ void Splash::makeWindow(string t){
 void Splash::makeContext(){
 	int dummy;
 	if (!glXQueryExtension(Xdisplay, &dummy, &dummy))
-		err("OpenGL not supported by X server\n");
+    logger::fatal("X server does not support OpenGL");
 
   render_context = glXCreateNewContext(Xdisplay, fbconfig, GLX_RGBA_TYPE, 0, True);
   if (!render_context)
-    err("Failed to create a GL context\n");
+    logger::fatal("Failed to create OpenGL context");
 
 	if (!glXMakeContextCurrent(Xdisplay, gWindow, gWindow, render_context))
-		err("glXMakeCurrent failed for window\n");
-}
-
-template<typename F, typename... Args>
-void Splash::render(F function, Args&&... args){
-
-  while (event::active) {
-
-    function(args...);
-
-  }
-
+    logger::fatal("Couldn't make context current");
 }

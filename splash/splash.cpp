@@ -20,16 +20,12 @@ int main( int argc, char* args[] ) {
 	Splash splash(parse::in);
 
 	const char * home = getenv ("HOME");
-	if(home == NULL){
-		logger::err("Home environment variable not set");
-		exit(0);
-	}
+	if(home == NULL)
+		logger::fatal("Home environment variable not set");
 	fs::path fp = fs::path(home);
 	Program* p = Program::get((fp/".config/splash/exec"/parse::in.prog).string(), lines, &parse::in);
-	if(p == NULL){
-		logger::err("Couldn't load program", parse::in.prog);
-		return 0;
-	}
+	if(p == NULL)
+		logger::fatal("Couldn't load program", parse::in.prog);
 
 	auto start = std::chrono::high_resolution_clock::now();
 

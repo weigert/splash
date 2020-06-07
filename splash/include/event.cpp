@@ -16,15 +16,6 @@ namespace event {
   	while (XPending(s.Xdisplay)){
   		XNextEvent(s.Xdisplay, &event);
   		switch (event.type){
-
-        /*
-        //Quit on Quit Command - not active currently
-    		case ClientMessage:
-    			if (event.xclient.data.l[0] == s.del_atom)
-    				return false;
-            break;
-        */
-
         case ButtonPress:
             data.clicktrigger = true;
             data.clicked = true;

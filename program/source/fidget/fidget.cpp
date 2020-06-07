@@ -15,6 +15,10 @@ private:
   Model mesh;
   Shader* shader;
 
+  //Dynamics Properties
+  float acc = 0.1;    //Acceleration
+  float frc = 0.01;   //Friction
+
 public:
 
   int WIDTH, HEIGHT;
@@ -54,13 +58,13 @@ public:
     mesh.model = R1*R2*mesh.model;
 
     if(e.clicked){
-      vrot[1] += 0.05f*e.rx;
-      vrot[0] += 0.05f*e.ry;
+      vrot[1] += acc*e.rx;
+      vrot[0] += acc*e.ry;
     }
 
-    vrot[0] += 0.02*(trot[0]-vrot[0]);
-    vrot[1] += 0.02*(trot[1]-vrot[1]);
-    vrot[2] += 0.02*(trot[2]-vrot[2]);
+    vrot[0] += frc*(trot[0]-vrot[0]);
+    vrot[1] += frc*(trot[1]-vrot[1]);
+    vrot[2] += frc*(trot[2]-vrot[2]);
 
     rot[0] += vrot[0];
     rot[1] += vrot[1];
