@@ -45,10 +45,10 @@ public:
 
   Display *Xdisplay;
   Window Xroot, Xwindow;
-  GLXWindow gWindow;
 
+  GLXWindow gWindow;
+  GLXContext gContext;
   GLXFBConfig fbconfig;
-  GLXContext render_context;
 
   //Positional Data (default)
   int x = 100, y = 100;
@@ -220,10 +220,10 @@ void Splash::makeContext(){
 	if (!glXQueryExtension(Xdisplay, &dummy, &dummy))
     logger::fatal("X server does not support OpenGL");
 
-  render_context = glXCreateNewContext(Xdisplay, fbconfig, GLX_RGBA_TYPE, 0, True);
-  if (!render_context)
+  gContext = glXCreateNewContext(Xdisplay, fbconfig, GLX_RGBA_TYPE, 0, True);
+  if (!gContext)
     logger::fatal("Failed to create OpenGL context");
 
-	if (!glXMakeContextCurrent(Xdisplay, gWindow, gWindow, render_context))
+	if (!glXMakeContextCurrent(Xdisplay, gWindow, gWindow, gContext))
     logger::fatal("Couldn't make context current");
 }
