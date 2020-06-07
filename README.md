@@ -6,9 +6,9 @@ Made in C++
 Tested on Ubuntu18 with Openbox
 
 ## Description
-splash is a generic tool that provides a command-line interface for rendering non-windowed raw-data directly onto your desktop environment.
+splash is a generic tool that provides a command-line interface for rendering non-windowed raw data directly onto your desktop environment.
 
-splash transforms your entire desktop into a 2D / 3D canvas, for dynamic data or simple static overlays that can interact.
+splash transforms your entire desktop into a 2D / 3D canvas, for dynamic data or simple static overlays that can interact with your mouse and keyboard and trigger commands.
 
 ## Usage
 
@@ -109,6 +109,7 @@ You can build your own visualization programs by defining a custom derived class
 Interesting Reads:
 
 https://www.linuxjournal.com/article/3687
+
 https://www.tldp.org/HOWTO/html_single/C++-dlopen/
 
 If there is a desire for more detailed information on how to build a custom visualization, I can update the Wiki (if I get requests).
@@ -121,6 +122,7 @@ If there is a desire for more detailed information on how to build a custom visu
   - Plotting methods
   - .obj file load and display
   - Particle system
+  - GIF display
 - Dynamic data streams by active pipe listening
 
 ### Why?
