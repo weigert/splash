@@ -126,6 +126,10 @@ https://www.linuxjournal.com/article/3687
 
 https://www.tldp.org/HOWTO/html_single/C++-dlopen/
 
+https://stackoverflow.com/questions/20443560/how-to-practically-ship-glsl-shaders-with-your-c-software
+
+https://stackoverflow.com/questions/4052940/how-to-make-an-opengl-rendering-context-with-transparent-background
+
 If there is a desire for more detailed information on how to build a custom visualization, I can update the Wiki (if I get requests).
 
 ## Notes
