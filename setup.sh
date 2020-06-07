@@ -23,7 +23,7 @@ printf "Compile splash? [Y / N] "
 read b
 if [ $b = "Y" ];then
   echo "Compiling splash..."
-  make -C "splash" all
+  make -C "splash" splash
 fi
 
 printf "Compile example programs? [Y / N] "
