@@ -3,6 +3,10 @@
 #include <vector>
 #include <unistd.h>
 
+#include <boost/filesystem/operations.hpp>
+#include <boost/filesystem/path.hpp>
+namespace fs = boost::filesystem;
+
 #include "helper/logger.h"
 #include "helper/parse.h"
 #include "helper/pipe.h"
@@ -15,3 +19,8 @@
     Splash 2020
     Author: Nicholas McDonald
 */
+
+//lmao
+void printhelp(){
+  logger::raw("splash 2020 by Nicholas McDonald");
+}

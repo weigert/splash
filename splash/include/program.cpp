@@ -12,7 +12,7 @@ using svec = std::vector<std::string>;
 
 class Program {
 public:
-  Program(svec *s){
+  Program(svec* s){
     data = s;
   }
 
@@ -25,13 +25,13 @@ public:
   virtual void pipeline() = 0;
   virtual void event(event::eventdata&) = 0;
 
-  static Program* get(std::string, svec* s);
+  static Program* get(std::string, svec* s, parse::data* d);
 };
 
-typedef Program* (*create_t)(svec* s);
+typedef Program* (*create_t)(svec* s, parse::data* d);
 typedef void destroy_t(Program*);
 
-Program* Program::get(std::string f, svec* s){
+Program* Program::get(std::string f, svec* s, parse::data* d){
 
 	void *hndl = dlopen(f.c_str(), RTLD_NOW);
   if(hndl == NULL){
@@ -47,7 +47,7 @@ Program* Program::get(std::string f, svec* s){
     return NULL;
   }
 
-	return t(s);
+	return t(s, d);
 }
 
 #endif

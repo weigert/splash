@@ -2,19 +2,30 @@
 
 int main( int argc, char* args[] ) {
 
-	std::vector<string>* lines;
-	if(spipe::available())
-		lines = spipe::read();
-
 	parse::input(argc, args);
 	if(!parse::in.program){
 		logger::err("No program");
 		return 0;
 	}
 
+	if(parse::in.prog == "--help"){
+		printhelp();
+		return 0;
+	}
+
+	std::vector<string>* lines;
+	if(spipe::available())
+		lines = spipe::read();
+
 	Splash splash(parse::in);
 
-	Program* p = Program::get("exec/"+parse::in.prog, lines);
+	const char * home = getenv ("HOME");
+	if(home == NULL){
+		logger::err("Home environment variable not set");
+		exit(0);
+	}
+	fs::path fp = fs::path(home);
+	Program* p = Program::get((fp/".config/splash/exec"/parse::in.prog).string(), lines, &parse::in);
 	if(p == NULL){
 		logger::err("Couldn't load program", parse::in.prog);
 		return 0;
@@ -37,6 +48,8 @@ int main( int argc, char* args[] ) {
 
 		p->pipeline();					//Execute the Program
 		p->event(event::data);	//Program Event Handling
+
+		event::handle();
 
 		glXSwapBuffers(splash.Xdisplay, splash.gWindow);
 

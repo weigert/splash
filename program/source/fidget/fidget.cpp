@@ -1,14 +1,25 @@
 #include "../../program.h"
 
 class Fidget : public Program {
+private:
+
+  //Shader Source
+  const std::string vs_source =
+    #include "fidget.vs"
+  ;
+  const std::string fs_source =
+    #include "fidget.fs"
+  ;
+
+  //Utility Classes
+  Model mesh;
+  Shader* shader;
+
 public:
 
   int WIDTH, HEIGHT;
   float zoom = 0.05;
-  float zoomInc = 0.001;
-  float rotation = 0.0f;
-  glm::vec3 cameraPos = glm::vec3(0, 0, 10);
-  glm::mat4 camera = glm::lookAt(cameraPos, glm::vec3(0, 0, 0), glm::vec3(0,1,0));
+  glm::mat4 camera = glm::lookAt(glm::vec3(0, 0, 10), glm::vec3(0, 0, 0), glm::vec3(0,1,0));
   glm::mat4 projection;
 
   string test = "Worked!";
@@ -17,24 +28,11 @@ public:
 	float vrot[3] = {0.0f}; //Initial Velocity
 	float trot[3] = {0.0f}; //Target Velocity ()
 
-  /*
-    Note: This is important, so on pre-compilation the
-    shader source is included directly in the class.
-  */
+  Fidget(svec* s, parse::data* d):Program(s){
+    WIDTH = d->w;
+    HEIGHT = d->h;
 
-  const std::string vs_source =
-    #include "fidget.vs"
-  ;
-
-  const std::string fs_source =
-    #include "fidget.fs"
-  ;
-
-  Fidget(svec* s):Program(s){
-    WIDTH = 1920;
-    HEIGHT = 1080;
-
-    projection = glm::ortho(-(float)WIDTH*zoom, (float)WIDTH*zoom, -(float)HEIGHT*zoom, (float)HEIGHT*zoom, -800.0f, 500.0f);
+    projection = glm::ortho(-(float)WIDTH*zoom, (float)WIDTH*zoom, -(float)HEIGHT*zoom, (float)HEIGHT*zoom, -50.0f, 50.0f);
 
     //Setup Stuff
     shader = new Shader({vs_source, fs_source}, {"in_Position", "in_Normal"}, true);
@@ -69,17 +67,9 @@ public:
     rot[2] += vrot[2];
   }
 
-  virtual void dummy(){
-    std::cout<<"Called Dummy"<<std::endl;
-  }
-
-  Model mesh;
-	Shader* shader;
-
   ~Fidget(){
       delete shader;
   }
-
 
   std::function<void(Model* m)> _build = [&](Model* h){
 
@@ -185,17 +175,13 @@ public:
   };
 };
 
+//Exporter
 extern "C" {
-  Program* create(svec* s) {
-      std::cout<<"Creating New Object"<<std::endl;
-      return new Fidget(s);
+  Program* create(svec* s, parse::data* d) {
+      return new Fidget(s, d);
   }
 
   void destroy(Program* p) {
       delete p;
-  }
-
-  void test(){
-    std::cout<<"Worked!"<<std::endl;
   }
 }

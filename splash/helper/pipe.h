@@ -6,7 +6,7 @@ namespace spipe {
   }
 
   vector<string>* read(){
-    vector<string>* lines = new vector<string>(0);
+    vector<string>* lines = new vector<string>;
     string line;
     while (getline(cin, line)){
       lines->push_back(line);

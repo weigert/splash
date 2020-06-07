@@ -64,7 +64,7 @@ public:
 
     //Options
     glLineWidth(2.0);
-    glViewport(0, 0, 1920, 1080);
+    glViewport(0, 0, parse::in.w, parse::in.h);
     glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
   }
 

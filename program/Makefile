@@ -1,10 +1,15 @@
-TINYLINK = -lX11 -ldl -lXfixes -lXrender -lSDL2 -lnoise -lSDL2_image -lGL -lGLEW -lboost_system -lboost_filesystem
-
+#Visualization Program Compilation!
 CC = g++ -std=c++17
-COMPILER_FLAGS = -Wfatal-errors -O
-LINKER_FLAGS = -I/usr/local/include -L/usr/local/lib -shared -fPIC
-OBJ_NAME = fidget.o
+CFLAGS = -Wfatal-errors -O
+LFLAGS = -I/usr/local/include -L/usr/local/lib -shared -fPIC
+LINK = -lX11 -ldl -lXfixes -lXrender -lSDL2 -lSDL2_image -lGL -lGLEW -lboost_system -lboost_filesystem
 
-all: source/fidget/fidget.cpp
-			$(CC) source/fidget/fidget.cpp $(COMPILER_FLAGS) $(LINKER_FLAGS) $(TINYLINK) -o $(OBJ_NAME)
-			mv fidget.o ../splash/exec/fidget
+fidget:
+	@$(CC) source/fidget/fidget.cpp $(CFLAGS) $(LFLAGS) $(LINK) -o fidget
+	mv fidget ~/.config/splash/exec/fidget
+
+img:
+	@$(CC) source/img/img.cpp $(CFLAGS) $(LFLAGS) $(LINK) -o img
+	mv img ~/.config/splash/exec/img
+
+all: fidget img

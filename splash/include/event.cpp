@@ -1,8 +1,8 @@
-
 namespace event {
 
   struct eventdata{
     bool clicked = false;
+    bool clicktrigger = false;
     int mx, my = 0;
     int rx, ry = 0;
   } data;
@@ -18,6 +18,7 @@ namespace event {
   		switch (event.type){
 
         /*
+        //Quit on Quit Command - not active currently
     		case ClientMessage:
     			if (event.xclient.data.l[0] == s.del_atom)
     				return false;
@@ -25,6 +26,7 @@ namespace event {
         */
 
         case ButtonPress:
+            data.clicktrigger = true;
             data.clicked = true;
             data.mx = event.xbutton.x;
             data.my = event.xbutton.y;
@@ -53,6 +55,11 @@ namespace event {
   	}
 
     return true;
+  }
+
+  void handle(){
+    //Reset Triggers
+    if(data.clicktrigger) data.clicktrigger = false;
   }
 
 } //End of Namespace

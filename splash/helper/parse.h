@@ -57,14 +57,6 @@ namespace parse{
       else std::cout<<"Insufficient Arguments"<<std::endl;
     }
 
-    if(arg == "-m"){
-      if(ac - n > 1){ //Sufficient Args
-        in.program = true;
-        in.prog = std::string(as[n+1]);
-        k++;
-      }
-    }
-
     input(n+k, ac, as);
   }
 

@@ -9,9 +9,6 @@ using Handle = std::function<void()>;
 using slist = std::initializer_list<std::string>;
 using svec = std::vector<std::string>;
 
-#include <boost/filesystem/operations.hpp>
-#include <boost/filesystem/path.hpp>
-
 #include <SDL2/SDL_image.h>
 
 #include "utility/texture.cpp"

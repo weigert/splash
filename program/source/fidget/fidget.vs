@@ -1,4 +1,4 @@
-R"(
+R""(
 
 #version 130
 
@@ -19,4 +19,4 @@ void main(void) {
 	ex_Color = vec4(normalize(in_Normal), 1.0);
 }
 
-)"
+)""
