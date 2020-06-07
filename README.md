@@ -139,11 +139,12 @@ If there is a desire for more detailed information on how to build a custom visu
 - Dynamic data streams by active pipe listening
 
 ### Why?
-This was originally written because I realized I could make transparent windows in X11 with an OpenGL3 context. So implemented a desktop fidget spinner. Check it out with:
+
+¯\_(ツ)_/¯
+
+*check out my dope desktop fidget spinner, man*
 
     splash fidget
-
-When I also realized that using the C library dlopen I could decouple the actual visualization method from both the data AND the window, I decided to make splash.
 
 ### A terrible Idea
 
