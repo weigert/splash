@@ -141,7 +141,7 @@ To enable shadow toggling, add the following rule (or similar) to your composito
     #Enable shadow toggling
     shadow-exclude = [
       #...
-      "_COMPTON_SHADOW_OFF@:32c = 0",
+      "SPLASH_SHADOW@:32c = 0",
       #...
     ];
     #...__
