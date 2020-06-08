@@ -107,7 +107,7 @@ Desktop Environments:
 
         Gnome               Works fully
         Openbox             Works fully
-        i3                  Broken
+        i3                  Broken (very)
         i3-gaps             Not tested
         bspwn               Not tested
 
