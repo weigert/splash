@@ -57,7 +57,29 @@ Splash requires specification of an execution mode.
       --bg    Place splash in background
       --fg    Place splash in foreground (default)
       --ni    Splash no-interact
+      --ns    Disable splash shadows (compton)
       --a     Display splash on all desktops
+
+### Note: Compton Shading
+This program depends on the existence of a compositor. If you use compton as your compositor, you can edit your `compton.conf` to enable shadow toggling for the splashes:
+
+    #Enable shadow toggling
+    shadow-exclude = [
+      #...
+      "_COMPTON_SHADOW_OFF@:32c = 0",
+      #...
+    ];
+    #...
+
+Adding this allows you to use `--ns` to toggle shadows.
+If you don't add this, then compton **will** shade splashes (if you have it activated), and it can't be deactivated for the splashes.
+__
+
+### Note: i3 configuration
+Add this line to your i3 config to make splash compatible:
+
+    # splash config       
+    for_window [window_type="splash"] border pixel 0
 
 ## Installation
 

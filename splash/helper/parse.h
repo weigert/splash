@@ -12,7 +12,7 @@ namespace parse{
     int t = -1;          //Timeout
     bool interact = true;
     bool all = false;
-
+    bool shade = true;
     bool program = false;
     std::string prog;
 
@@ -26,13 +26,14 @@ namespace parse{
     int k = 1;
 
     //Flag Arguments
-
-    if(arg == "--t") in.test = true;
-    if(arg == "--v") logger::verbose = true;
+    
+    if(arg == "--v")    logger::verbose = true;
+    if(arg == "--t")    in.test = true;
     if(arg == "--bg")   in.bg = true;
-    if(arg == "--fg")   in.bg = false; //(default)
-    if(arg == "--ni")   in.interact = false; //(default)
-    if(arg == "--a")   in.all = true; //(default)
+    if(arg == "--fg")   in.bg = false;  //default
+    if(arg == "--ni")   in.interact = false;
+    if(arg == "--ns")   in.shade = false;
+    if(arg == "--a")    in.all = true;
 
     //Data-Arguments
 

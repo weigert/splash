@@ -19,6 +19,15 @@ namespace event {
   bool active = true;
 }
 
+//Supported Desktop Environments
+enum DE{
+  NADE,   //Not-A-Desktop-Environment (unrecognized)
+  OBX,    //Openbox
+  XFCE,   //XFCE
+  GNOME,  //Gnome
+  I3      //I3
+};
+
 class Splash{
 public:
 
@@ -62,6 +71,13 @@ public:
   void makeWindow(string title);
   void makeContext();
 
+  void desetup();   //Setup specific for the DE
+  string getDE(){
+    if(const char* env_p = std::getenv("DESKTOP_SESSION"))
+      return std::string(env_p);
+    else return "NADE";
+  }
+
   bool property(string type, string prop, int set);
   bool property(string type, unsigned long prop, int set);
 
@@ -70,6 +86,35 @@ public:
   	XCloseDisplay(Xdisplay);
   };
 };
+
+void Splash::desetup(){
+  string de = getDE();
+  logger::write("DE:", de);
+
+  if(all) property("_NET_WM_DESKTOP", 0xFFFFFFFF, 1);
+  Atom a = XInternAtom(Xdisplay, "_NET_WM_WINDOW_TYPE", 0);
+  Atom b = XInternAtom(Xdisplay, "_NET_WM_WINDOW_TYPE_SPLASH", 0);
+  XChangeProperty(Xdisplay, Xwindow, a, XA_ATOM, 32,
+          PropModeReplace, (unsigned char*)&b, 1);
+
+  //Disable Compton Shadow
+  /* https://www.systutorials.com/docs/linux/man/1-compton/ */
+  if(!parse::in.shade){
+    a = XInternAtom(Xdisplay, "_COMPTON_SHADOW_OFF", 0);
+    unsigned long i = 0;
+    XChangeProperty(Xdisplay, Xwindow, a, XA_CARDINAL, 32,
+            PropModeReplace, (unsigned char*)&i, 1);
+  }
+
+  property("_NET_WM_STATE", "_NET_WM_STATE_SKIP_TASKBAR", 1);    //Does not appear in Alt+Tab
+  property("_NET_WM_STATE", "_NET_WM_STATE_SKIP_PAGER", 1);
+}
+
+/*
+    These two can be unified...
+    just add the compton flag anyway.
+*/
+
 
 bool Splash::property(string type, unsigned long prop, int set){
   Atom _type = XInternAtom(Xdisplay, type.c_str(), 1);
@@ -177,6 +222,10 @@ void Splash::makeWindow(string t){
 	textprop.nitems = t.length();
 
   XSizeHints hints;
+  hints.x = x;        //Required for i3!
+	hints.y = y;
+	hints.width = w;
+	hints.height = h;
 	hints.flags = USPosition | USSize;
 
   XWMHints *startup_state = XAllocWMHints();
@@ -186,27 +235,15 @@ void Splash::makeWindow(string t){
 			NULL, 0, &hints, startup_state, NULL);
 	XFree(startup_state);
 
-  //Set all Desktops Pre-Map
-  if(all) property("_NET_WM_DESKTOP", 0xFFFFFFFF, 1);
-
-  Atom a = XInternAtom(Xdisplay, "_NET_WM_WINDOW_TYPE", 0);
-  Atom b;
-
-  if(background) b = XInternAtom(Xdisplay, "_NET_WM_WINDOW_TYPE_DESKTOP", 0);
-  else b = XInternAtom(Xdisplay, "_NET_WM_WINDOW_TYPE_DOCK", 0);
-  XChangeProperty(Xdisplay, Xwindow, a, XA_ATOM, 32,
-          PropModeReplace, (unsigned char*)&b, 1);
+  desetup();
 
   XMapWindow(Xdisplay, Xwindow);
 
-  if(!background)
-    property("_NET_WM_STATE", "_NET_WM_STATE_ABOVE", 1);
-  else
-    property("_NET_WM_STATE", "_NET_WM_STATE_BELOW", 1);
-  property("_NET_WM_STATE", "_NET_WM_STATE_SKIP_TASKBAR", 1);    //Does not appear in Alt+Tab
-  property("_NET_WM_STATE", "_NET_WM_STATE_SKIP_PAGER", 1);
+  //After Mapping
+  if(!background) property("_NET_WM_STATE", "_NET_WM_STATE_ABOVE", 1);
+  else            property("_NET_WM_STATE", "_NET_WM_STATE_BELOW", 1);
 
-  //No Inputs
+  //Interaction removing needs to happen after mapping
   if(!interact){
     XRectangle rect;
     XserverRegion region = XFixesCreateRegion(Xdisplay, &rect, 1);

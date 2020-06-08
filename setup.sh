@@ -32,3 +32,5 @@ if [ $b == "Y" ]; then
   echo "Compiling programs..."
   make -C "program" all
 fi
+
+printf "splash: Success"
