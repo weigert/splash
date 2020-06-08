@@ -248,6 +248,9 @@ void Splash::makeWindow(string t){
     Atom b = XInternAtom(Xdisplay, "_NET_WM_STATE_STICKY", 0);
     XChangeProperty(Xdisplay, Xwindow, a, XA_ATOM, 32,
             PropModeReplace, (unsigned char*)&b, 1);
+
+    //Openbox wants this
+    if(getDE() == "openbox") property("_NET_WM_DESKTOP", 0xFFFFFFFF, 1);
   }
 
   XMapWindow(Xdisplay, Xwindow);
