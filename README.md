@@ -138,6 +138,8 @@ splash requires a compositor. If you use compton, splash screens will be default
 
 If you don't add this, compton **will always** shade splashes, and it can't be deactivated with `--ns`.
 
+**Note:** You can add an analogous flag for other compositors (e.g. see [Picom](https://wiki.archlinux.org/index.php/Picom)). The `--ns` flag simply sets the X11 window property above.
+
 ### i3 and i3-gaps
 Both of these window managers do not support the EWMH specification for specifying a preferred order of floating windows (specifically `_NET_WM_STATE_ABOVE` and `_NET_WM_STATE_BELOW`).
 
