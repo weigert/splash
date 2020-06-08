@@ -1,9 +1,9 @@
 # splash
-Unix Splash Screen Tool
+Unix Splash Screen Tool - turn your desktop into a 2D / 3D canvas
 
 Made in C++
 
-see below for distro / DE compatbility
+See below for distro / DE compatbility
 
 ## Description
 splash is a generic tool that provides a command-line interface for rendering non-windowed raw data directly onto your desktop environment.
@@ -60,27 +60,6 @@ Splash requires specification of an execution mode.
       --ns    Disable splash shadows (compton)
       --a     Display splash on all desktops
 
-### Note: Compton Shading
-This program depends on the existence of a compositor. If you use compton as your compositor, you can edit your `compton.conf` to enable shadow toggling for the splashes:
-
-    #Enable shadow toggling
-    shadow-exclude = [
-      #...
-      "_COMPTON_SHADOW_OFF@:32c = 0",
-      #...
-    ];
-    #...
-
-Adding this allows you to use `--ns` to toggle shadows.
-If you don't add this, then compton **will** shade splashes (if you have it activated), and it can't be deactivated for the splashes.
-__
-
-### Note: i3 configuration
-Add this line to your i3 config to make splash compatible:
-
-    # splash config       
-    for_window [window_type="splash"] border pixel 0
-
 ## Installation
 
 ### Dependencies
@@ -103,7 +82,6 @@ The execution modes are placed in `~/.config/splash/exec` and splash is placed i
 
 ### Compiling
 
-
 If you wish to compile manually, use the makefiles in `splash/Makefile` and `program/Makefile`:
 
     ./splash:
@@ -113,26 +91,72 @@ If you wish to compile manually, use the makefiles in `splash/Makefile` and `pro
       make [mode]
       make all
 
-
 Note that splash is separate from the actual execution modes. Execution modes are compiled separately (linked at runtime by splash).
 
-### Compabitibility
+### Issues Compiling
+
+If you have problems with compiling search the closed issues to see if there is a solution and otherwise feel free to open a ticket.
+
+Common problems might include: Incorrect linking in the make files, because your distro places libraries in a different location, and slightly different names of the libraries in `#include` directives.
+
+## Compabitibility
 
 This is just from some basic tests I can run on my computer. If you can compile / test on other distros and DEs, please open an issue so I can add it here.
 
 Distros:
 
         Ubuntu 18           Compilation work
-        Arch / Manjaro      Compilation incomplete
+        Arch / Manjaro      Compilation incomplete (fixable, see issues)
+        ...                 Feel free to open an issue for your distro!
 
 Desktop Environments:
 
-        Gnome               Works fully
+        Gnome / Ubuntu      Works fully
         Openbox             Works fully
-        i3                  Broken (very)
-                                Reason: i3 is very strict about how it places windows. I am working on a work-around.
-        i3-gaps             Not tested
-        bspwn               Not tested
+        XFCE                Works fully
+
+        i3                  *Restricted (see below)*
+        i3-gaps             *Similar to i3*
+
+        bspwm               Not tested
+
+        ...                 Feel free to open an issue for your DE!
+
+The issues with the various distros are explained below.
+
+The various degrees of compatibility depend on how strictly the window manager conforms to the X11 extended window manager hints specification ([EWMH](https://specifications.freedesktop.org/wm-spec/wm-spec-latest.html)).
+
+### Sidenote: compton shading
+splash requires a compositor. If you use compton, splash screens will be default have shadows even with a transparent background. Shadows can be toggled using the `--ns` flag if you edit your `~/.config/compton.conf`:
+
+    #Enable shadow toggling
+    shadow-exclude = [
+      #...
+      "_COMPTON_SHADOW_OFF@:32c = 0",
+      #...
+    ];
+    #...__
+
+If you don't add this, compton **will always** shade splashes, and it can't be deactivated with `--ns`.
+
+### i3 and i3-gaps
+Both of these window managers do not support the EWMH specification for specifying a preferred order of floating windows (specifically `_NET_WM_STATE_ABOVE` and `_NET_WM_STATE_BELOW`).
+
+These DEs seemingly work with two separate layers of windows (tiled and floating). Therefore, the `--bg` and `--fg` options do not work as intended.
+
+All options work correctly, except that the splash will never "disappear" behind tiled windows (because there is no "desktop"), and splashes will conflict with other floating windows.
+
+If you never use other floating windows and use splash just for overlays, the program works as intended.
+
+See also:
+
+https://github.com/i3/i3/issues/3265
+
+#### i3 config
+Add this line to your i3 config to make splash compatible (removes borders for windows of type splash, i.e. `_NET_WM_WINDOW_TYPE_SPLASH`):
+
+    # splash config       
+    for_window [window_type="splash"] border pixel 0
 
 ## Customization & How it Works
 

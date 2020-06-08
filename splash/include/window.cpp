@@ -91,7 +91,6 @@ void Splash::desetup(){
   string de = getDE();
   logger::write("DE:", de);
 
-  if(all) property("_NET_WM_DESKTOP", 0xFFFFFFFF, 1);
   Atom a = XInternAtom(Xdisplay, "_NET_WM_WINDOW_TYPE", 0);
   Atom b = XInternAtom(Xdisplay, "_NET_WM_WINDOW_TYPE_SPLASH", 0);
   XChangeProperty(Xdisplay, Xwindow, a, XA_ATOM, 32,
@@ -236,6 +235,13 @@ void Splash::makeWindow(string t){
 	XFree(startup_state);
 
   desetup();
+
+  if(all){
+    Atom a = XInternAtom(Xdisplay, "_NET_WM_STATE", 0);
+    Atom b = XInternAtom(Xdisplay, "_NET_WM_STATE_STICKY", 0);
+    XChangeProperty(Xdisplay, Xwindow, a, XA_ATOM, 32,
+            PropModeReplace, (unsigned char*)&b, 1);
+  }
 
   XMapWindow(Xdisplay, Xwindow);
 
