@@ -80,7 +80,7 @@ The script will also ask if you wish to compile splash and the execution modes.
 
 The execution modes are placed in `~/.config/splash/exec` and splash is placed in `/usr/local/bin`.
 
-### Compiling
+#### Manual Compiling
 
 If you wish to compile manually, use the makefiles in `splash/Makefile` and `program/Makefile`:
 
@@ -93,38 +93,37 @@ If you wish to compile manually, use the makefiles in `splash/Makefile` and `pro
 
 Note that splash is separate from the actual execution modes. Execution modes are compiled separately (linked at runtime by splash).
 
-### Issues Compiling
+#### Compilation Issues
 
 If you have problems with compiling search the closed issues to see if there is a solution and otherwise feel free to open a ticket.
 
 Common problems might include: Incorrect linking in the make files, because your distro places libraries in a different location, and slightly different names of the libraries in `#include` directives.
 
-## Compabitibility
+## Compabitibility / Requirements
 
 This is just from some basic tests I can run on my computer. If you can compile / test on other distros and DEs, please open an issue so I can add it here.
 
 Distros:
 
-        Ubuntu 18           Compilation work
-        Arch / Manjaro      Compilation incomplete (fixable, see issues)
-        ...                 Feel free to open an issue for your distro!
+        Ubuntu 18           works!
+        Arch / Manjaro      works! (see issues)
+        ...                 feel free to open an issue for your distro!
 
 Desktop Environments:
 
-        Gnome / Ubuntu      Works fully
-        Openbox             Works fully
-        XFCE                Works fully
+        Gnome / Ubuntu      works fully
+        Openbox             works fully
+        XFCE                works fully
 
         i3                  *Restricted (see below)*
-        i3-gaps             *Similar to i3*
-
+        i3-gaps             Not tested
         bspwm               Not tested
 
         ...                 Feel free to open an issue for your DE!
 
 The issues with the various distros are explained below.
 
-The various degrees of compatibility depend on how strictly the window manager conforms to the X11 extended window manager hints specification ([EWMH](https://specifications.freedesktop.org/wm-spec/wm-spec-latest.html)).
+The various degrees of compatibility depend on how strictly the window manager conforms to the X11 extended window manager hints specification ([EWMH](https://specifications.freedesktop.org/wm-spec/wm-spec-latest.html)). Particularly tiling window managers don't adhere entirely, making it more difficult to produce consistent splash behavior.
 
 ### Sidenote: compton shading
 splash requires a compositor. If you use compton, splash screens will be default have shadows even with a transparent background. Shadows can be toggled using the `--ns` flag if you edit your `~/.config/compton.conf`:
@@ -142,9 +141,11 @@ If you don't add this, compton **will always** shade splashes, and it can't be d
 ### i3 and i3-gaps
 Both of these window managers do not support the EWMH specification for specifying a preferred order of floating windows (specifically `_NET_WM_STATE_ABOVE` and `_NET_WM_STATE_BELOW`).
 
-These DEs seemingly work with two separate layers of windows (tiled and floating). Therefore, the `--bg` and `--fg` options do not work as intended.
+These DEs seemingly work with two separate layers of windows (tiled and floating). Therefore, the `--bg` and `--fg` options do not work as intended (splashes will be permanently on the floating window layer). Splashes will never "disappear" behind tiled windows. Splashes will conflict with other floating windows too, and not stay above or below other windows.
 
-All options work correctly, except that the splash will never "disappear" behind tiled windows (because there is no "desktop"), and splashes will conflict with other floating windows.
+Additionally, i3 is not compatible with the Xfixes library and makes it difficult to disable user input / hover focus for the window, so the `--ni` flag will also not work. For some reason, i3 decides that a window with no input area has its entire area instead be it's border, so dragging on a splash after setting the `--ni` flag will instead resize it in a wonky way.
+
+All other options work as intended.
 
 If you never use other floating windows and use splash just for overlays, the program works as intended.
 
@@ -152,11 +153,15 @@ See also:
 
 https://github.com/i3/i3/issues/3265
 
+I am thinking of a work around but it's a bit of work and requires an even deeper dive into X than the EWMH spec.
+
 #### i3 config
-Add this line to your i3 config to make splash compatible (removes borders for windows of type splash, i.e. `_NET_WM_WINDOW_TYPE_SPLASH`):
+Add this line to your i3 config to make splash semi-compatible (removes borders for windows of type splash, i.e. `_NET_WM_WINDOW_TYPE_SPLASH`):
 
     # splash config       
     for_window [window_type="splash"] border pixel 0
+    
+The issues mentioned above will still persist, but splash will work for certain applications, and you can still get on-screen windowless opengl contexts as a floating window.
 
 ## Customization & How it Works
 
