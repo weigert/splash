@@ -230,8 +230,12 @@ void Splash::makeWindow(string t){
   XWMHints *startup_state = XAllocWMHints();
 	startup_state->initial_state = NormalState;
 	startup_state->flags = StateHint;
+  char CLASS_NAME[] = "SPLASH";
+  XClassHint *class_hint = XAllocClassHint();
+	class_hint->res_name = CLASS_NAME;
+	class_hint->res_class = CLASS_NAME;
 	XSetWMProperties(Xdisplay, Xwindow, &textprop, &textprop,
-			NULL, 0, &hints, startup_state, NULL);
+			NULL, 0, &hints, startup_state, class_hint);
 	XFree(startup_state);
 
   desetup();
