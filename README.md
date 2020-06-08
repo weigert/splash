@@ -108,6 +108,7 @@ Desktop Environments:
         Gnome               Works fully
         Openbox             Works fully
         i3                  Broken (very)
+                                Reason: i3 is very strict about how it places windows. I am working on a work-around.
         i3-gaps             Not tested
         bspwn               Not tested
 
