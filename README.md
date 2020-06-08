@@ -93,7 +93,7 @@ If you wish to compile manually, use the makefiles in `splash/Makefile` and `pro
 
 Note that splash is separate from the actual execution modes. Execution modes are compiled separately (linked at runtime by splash).
 
-### Issues Compiling
+### Compilation Issues
 
 If you have problems with compiling search the closed issues to see if there is a solution and otherwise feel free to open a ticket.
 
@@ -105,8 +105,8 @@ This is just from some basic tests I can run on my computer. If you can compile 
 
 Distros:
 
-        Ubuntu 18           Compilation work
-        Arch / Manjaro      Compilation incomplete (fixable, see issues)
+        Ubuntu 18           Compilation works
+        Arch / Manjaro      Compilation works (fixable, see issues)
         ...                 Feel free to open an issue for your distro!
 
 Desktop Environments:
@@ -114,17 +114,20 @@ Desktop Environments:
         Gnome / Ubuntu      Works fully
         Openbox             Works fully
         XFCE                Works fully
+        bspwm               Works fully
 
         i3                  *Restricted (see below)*
         i3-gaps             *Similar to i3*
-
-        bspwm               Not tested
 
         ...                 Feel free to open an issue for your DE!
 
 The issues with the various distros are explained below.
 
 The various degrees of compatibility depend on how strictly the window manager conforms to the X11 extended window manager hints specification ([EWMH](https://specifications.freedesktop.org/wm-spec/wm-spec-latest.html)).
+
+Oftentimes, this can be mitigated by by setting up the WM configuration correctly.
+
+### Congi
 
 ### Sidenote: compton shading
 splash requires a compositor. If you use compton, splash screens will be default have shadows even with a transparent background. Shadows can be toggled using the `--ns` flag if you edit your `~/.config/compton.conf`:

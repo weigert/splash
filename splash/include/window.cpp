@@ -96,17 +96,24 @@ void Splash::desetup(){
   XChangeProperty(Xdisplay, Xwindow, a, XA_ATOM, 32,
           PropModeReplace, (unsigned char*)&b, 1);
 
-  //Disable Compton Shadow
-  /* https://www.systutorials.com/docs/linux/man/1-compton/ */
-  if(!parse::in.shade){
-    a = XInternAtom(Xdisplay, "_COMPTON_SHADOW_OFF", 0);
-    unsigned long i = 0;
-    XChangeProperty(Xdisplay, Xwindow, a, XA_CARDINAL, 32,
-            PropModeReplace, (unsigned char*)&i, 1);
-  }
+  //Disable Compositor Shading
+  /* example; https://www.systutorials.com/docs/linux/man/1-compton/ */
+  a = XInternAtom(Xdisplay, "SPLASH_SHADOW", 0);
+  unsigned long i = (parse::in.shade == true)?1:0;
+  XChangeProperty(Xdisplay, Xwindow, a, XA_CARDINAL, 32,
+          PropModeReplace, (unsigned char*)&i, 1);
 
   property("_NET_WM_STATE", "_NET_WM_STATE_SKIP_TASKBAR", 1);    //Does not appear in Alt+Tab
   property("_NET_WM_STATE", "_NET_WM_STATE_SKIP_PAGER", 1);
+
+  //Set the Class Hint
+  XClassHint *class_hints = XAllocClassHint();
+  string _name = "SPLASH";
+  string _class = "SPLASH";
+  class_hints->res_name = (char*)_name.c_str();
+  class_hints->res_class = (char*)_class.c_str();
+  XSetClassHint(Xdisplay, Xwindow, class_hints);
+  XFree(class_hints);
 }
 
 /*
