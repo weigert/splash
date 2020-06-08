@@ -180,10 +180,10 @@ https://github.com/i3/i3/issues/3265
 
 I am thinking of a work around but it's a bit of work and requires an even deeper dive into X than the EWMH spec.
 
-Add this line to your i3 config to make splash semi-compatible (removes borders for windows of type splash, i.e. `_NET_WM_WINDOW_TYPE_SPLASH`):
+Add this line to your i3 config to make splash semi-compatible:
 
     # splash config       
-    for_window [window_type="splash"] border pixel 0
+    for_window [class="SPLASH"] border pixel 0
 
 The issues mentioned above will still persist, but splash will work for certain applications, and you can still get on-screen windowless opengl contexts as a floating window.
 
