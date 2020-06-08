@@ -125,8 +125,8 @@ The issues with the various distros are explained below.
 
 The various degrees of compatibility depend on how strictly the window manager conforms to the X11 extended window manager hints specification ([EWMH](https://specifications.freedesktop.org/wm-spec/wm-spec-latest.html)). Particularly tiling window managers don't adhere entirely, making it more difficult to produce consistent splash behavior.
 
-### Sidenote: compton shading
-splash requires a compositor. If you use compton, splash screens will be default have shadows even with a transparent background. Shadows can be toggled using the `--ns` flag if you edit your `~/.config/compton.conf`:
+### Sidenote: compton shadows
+splash requires a compositor. If you use compton, splash screens will by default have shadows even with a transparent background. Shadows can be toggled using the `--ns` flag if you edit your `~/.config/compton.conf`:
 
     #Enable shadow toggling
     shadow-exclude = [
@@ -138,7 +138,7 @@ splash requires a compositor. If you use compton, splash screens will be default
 
 If you don't add this, compton **will always** shade splashes, and it can't be deactivated with `--ns`.
 
-**Note:** You can add an analogous flag for other compositors (e.g. see [Picom](https://wiki.archlinux.org/index.php/Picom)). The `--ns` flag simply sets the X11 window property above.
+**Note:** You can add an analogous flag for other compositors (e.g. see [Picom](https://wiki.archlinux.org/index.php/Picom)). The `--ns` flag simply sets the X11 window property `_COMPTON_SHADOW_OFF` to 0.
 
 ### i3 and i3-gaps
 Both of these window managers do not support the EWMH specification for specifying a preferred order of floating windows (specifically `_NET_WM_STATE_ABOVE` and `_NET_WM_STATE_BELOW`).
