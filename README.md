@@ -114,10 +114,10 @@ Desktop Environments:
         Gnome / Ubuntu      works fully
         Openbox             works fully
         XFCE                works fully
+        bspwm               works fully*
 
         i3                  *Restricted (see below)*
         i3-gaps             Not tested
-        bspwm               Not tested
 
         ...                 Feel free to open an issue for your DE!
 
@@ -164,6 +164,25 @@ Add this line to your i3 config to make splash semi-compatible (removes borders 
     for_window [window_type="splash"] border pixel 0
     
 The issues mentioned above will still persist, but splash will work for certain applications, and you can still get on-screen windowless opengl contexts as a floating window.
+
+### bspwm
+bspwm allows for all features! 
+
+There is a small catch though. It still likes to force windows into specific positions, so you need to spawn the splash and then "float" the bspc node. bspwm will thereby ignore the position data you give to splash, and you need to manually readjust it using the commands given in your `~/.config/shxkd/shxkdrc`.
+
+If immediately after spawning the splash you call:
+
+        #float the node
+        bspc node -t floating
+
+        #move the node by x, y (it spawns in the bottom left for some reason)
+        bspc node -v $x $y
+        
+That should work, because the splash should become the focused node. Don't quote me on this, I'm not a bspwm expert.
+        
+I could make a wrapper for this, but I'm seeing if there is a way to work around this inconvenience in general.
+
+make sure you have a compositor (e.g. compton).
 
 ## Customization & How it Works
 
