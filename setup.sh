@@ -1,5 +1,10 @@
 #!/bin/bash
 
+# Get the user dir for the user that is executing the script
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+HOME=/home/$(echo $DIR | cut -d/ -f3)
+
+
 # Setup script for splash
 printf "Setting up splash...\n"
 
