@@ -170,7 +170,7 @@ bspwm allows for all features!
 
 There is a small catch though. It still likes to force windows into specific positions, so you need to spawn the splash and then "float" the bspc node. bspwm will thereby ignore the position data you give to splash, and you need to manually readjust it using the commands given in your `~/.config/shxkd/shxkdrc`.
 
-If immediately after spawning the splash you call:
+You could float and position the node correctly using:
 
         #float the node
         bspc node -t floating
@@ -178,9 +178,7 @@ If immediately after spawning the splash you call:
         #move the node by x, y (it spawns in the bottom left for some reason)
         bspc node -v $x $y
         
-That should work, because the splash should become the focused node. Don't quote me on this, I'm not a bspwm expert.
-        
-I could make a wrapper for this, but I'm seeing if there is a way to work around this inconvenience in general.
+But that requires typing in a terminal of an unfocused window which isn't possible, so you have to use your keybindings manually. I am not sure how you could work around this manual bit and build it into a "bspwm wrapper" script. I'm seeing if there is a way to work around this inconvenience in general.
 
 make sure you have a compositor (e.g. compton).
 
