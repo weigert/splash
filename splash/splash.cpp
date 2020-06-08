@@ -51,5 +51,6 @@ int main( int argc, char* args[] ) {
 
 	}
 
+	delete p;
 	return 0;
 }
