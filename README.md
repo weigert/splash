@@ -183,7 +183,8 @@ I am thinking of a work around but it's a bit of work and requires an even deepe
 Add this line to your i3 config to make splash semi-compatible:
 
     # splash config       
-    for_window [class="SPLASH"] border pixel 0
+    for_window [class="SPLASH"] border none
+    for_window [class="SPLASH"] floating enable
 
 The issues mentioned above will still persist, but splash will work for certain applications, and you can still get on-screen windowless opengl contexts as a floating window.
 
