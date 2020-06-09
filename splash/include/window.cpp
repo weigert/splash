@@ -35,8 +35,8 @@ public:
 
   Splash(parse::data in):
   x{in.x}, y{in.y}, w{in.w}, h{in.h},
-  interact{in.interact}, background{in.bg},
-  all{in.all}
+  interact{!in.flags["--ni"]}, background{!in.flags["--fg"]},
+  all{in.flags["--a"]}
   { setup(); }
 
   void setup(){
@@ -48,6 +48,9 @@ public:
 
     //Options
     glLineWidth(2.0);
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glEnable(GL_MULTISAMPLE);
     glViewport(0, 0, parse::in.w, parse::in.h);
     glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
   }
@@ -99,7 +102,7 @@ void Splash::desetup(){
   //Disable Compositor Shading
   /* example; https://www.systutorials.com/docs/linux/man/1-compton/ */
   a = XInternAtom(Xdisplay, "SPLASH_SHADOW", 0);
-  unsigned long i = (parse::in.shade == true)?1:0;
+  unsigned long i = (!parse::in.flags["--ns"])?1:0;
   XChangeProperty(Xdisplay, Xwindow, a, XA_CARDINAL, 32,
           PropModeReplace, (unsigned char*)&i, 1);
 

@@ -38,11 +38,14 @@ Splash requires specification of an execution mode.
       <data>:   None
 
       img       Display .png image
-      <data>:   Image file name
+      [data]:   Image file name
 
       gif       Display .gif image
-      <data>:   GIF file name
+      [data]:   GIF file name
       Note:     Only works for full replacing gifs!
+
+      text      Render truetype text (static)
+      [data]:   Text to render
 
     Options:
 
@@ -59,6 +62,43 @@ Splash requires specification of an execution mode.
       --ni    Splash no-interact
       --ns    Disable splash shadows (compton)
       --a     Display splash on all desktops
+
+Program specific flags:
+
+      text
+
+      -ff [font]    Font face (searches in ~/.fonts/, default "arial.ttf")
+      -fc [hex]     Text color (hex code, e.g. 0xFFFFFF)
+      -fs [size]    Font size, positive integer
+      --fi          Italic
+      --fb          Bold
+      --fu          Underlined
+      --fs          Strikethrough
+      --vu          Vertically align up
+      --vd          Vertically align down
+      --vc          Vertically align center (default)
+      --hl          Horizontally align left
+      --hr          Horizontally align right
+      --hc          Horizontally align center (default)
+
+### Examples
+Check the `/testdata/` folder for example programs to splash some data onto your screen.
+
+      #Default desktop fidget spinner (no shadow, foreground)
+
+        splash fidget -p 710 290 500 500 --ns --fg
+
+      #Animated SMB wallpaper gif (no interact, all screens, no shadow)
+
+        echo "smb.gif" | splash gif -p 660 340 600 400 --bg --ni --a --ns
+
+      #Display an Image (with shading, blocks mouse input)
+
+        echo "image.png" | splash img -p 360 140 1200 800
+
+      #Display some text on your background
+
+        echo "splash" | splash text -p 100 100 800 400 --bg --ns  -ff "arial.ttf" -fs 100
 
 ## Installation
 

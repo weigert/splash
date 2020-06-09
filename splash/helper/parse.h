@@ -1,18 +1,15 @@
 namespace parse{
+using namespace std;
 
   //Parse Data Struct
   struct data{
 
-    bool test = false;  //Test Configuration File
-    bool bg = false;    //Background / Foreground
-    bool pdata = false;
-    int x = 0, y = 0,
-    w = 1920, h = 1080;     //Position Data
-    bool timeout = false;
-    int t = -1;          //Timeout
-    bool interact = true;
-    bool all = false;
-    bool shade = true;
+    unordered_map<string, bool> flags;
+    unordered_map<string, bool> pflags;
+    unordered_map<string, string> params;
+
+    int x = 0, y = 0, w = 1920, h = 1080;
+
     bool program = false;
     std::string prog;
 
@@ -22,43 +19,30 @@ namespace parse{
   void input(int n, int ac, char* as[]){
     if(n == ac) return;
 
-    std::string arg = std::string(as[n]);
-    int k = 1;
+    string arg = string(as[n]);
 
-    //Flag Arguments
-    
-    if(arg == "--v")    logger::verbose = true;
-    if(arg == "--t")    in.test = true;
-    if(arg == "--bg")   in.bg = true;
-    if(arg == "--fg")   in.bg = false;  //default
-    if(arg == "--ni")   in.interact = false;
-    if(arg == "--ns")   in.shade = false;
-    if(arg == "--a")    in.all = true;
+    //Flag Argument
+    if(arg.substr(0, 2) == "--" && arg.length() > 2)
+      in.flags[arg] = true;
 
-    //Data-Arguments
+    //Parameter Argument
+    else if(arg.substr(0, 1) == "-" && arg.length() > 1){
+      int k = n + 1;
+      if(k == ac) //out of bounds
+        return;
 
-    if(arg == "-p"){ //Position data
-      if(ac - n > 4){ //Sufficient Args
-        in.pdata = true;
-        in.x = atoi(as[n+1]);
-        in.y = atoi(as[n+2]);
-        in.w = atoi(as[n+3]);
-        in.h = atoi(as[n+4]);
-        k += 4;
+      string p = "";
+      for(int b = 0; k + b < ac; b++){
+        in.pflags[arg] = true;
+        p = string(as[k+b]);
+        if(p.substr(0, 1) == "-")
+          break;
+        in.params[arg+to_string(b)] = p;
+        n = k + b;
       }
-      else std::cout<<"Insufficient Arguments"<<std::endl;
     }
 
-    if(arg == "-t"){ //Position data
-      if(ac - n > 1){ //Sufficient Args
-        in.timeout = true;
-        in.t = atoi(as[n+1]);
-        k++;
-      }
-      else std::cout<<"Insufficient Arguments"<<std::endl;
-    }
-
-    input(n+k, ac, as);
+    input(++n, ac, as);
   }
 
   //Master Fetch
@@ -66,7 +50,20 @@ namespace parse{
     if(ac < 2) return;
     in.prog = std::string(as[1]);
     in.program = true;
+
     input(2, ac, as);
+
+    //Do some necessary parsing
+    if(in.pflags["-p"])
+      in.x = stoi(in.params["-p0"]);
+    if(in.pflags["-p"])
+      in.y = stoi(in.params["-p1"]);
+    if(in.pflags["-p"])
+      in.w = stoi(in.params["-p2"]);
+    if(in.pflags["-p"])
+      in.h = stoi(in.params["-p3"]);
+
+    logger::verbose = in.flags["--v"];
   }
 
 };

@@ -15,6 +15,7 @@ public:
   static tfunc parameter;       //Texture Parameter Setter!
   GLuint texture;               //Texture int (OpenGL: everything is an int!)
   GLenum type = GL_TEXTURE_2D;  //Texture type (default is this)
+  int W, H;
 
   void empty(int W, int H, tfunc param = parameter, GLenum F = GL_RGBA){
     glBindTexture( type, texture );
@@ -30,6 +31,7 @@ public:
     glBindTexture( type, texture );
     glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
     glTexImage2D(type, 0, GL_RGBA, s->w, s->h, 0, GL_RGBA, GL_UNSIGNED_BYTE, s->pixels);
+    W = s->w; H = s->h;
     (param)(this); //Call the parameter setting function!
   }
 };

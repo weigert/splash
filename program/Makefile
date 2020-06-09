@@ -16,4 +16,8 @@ gif:
 	@$(CC) source/gif/gif.cpp $(CFLAGS) $(LFLAGS) -lgif $(LINK) -o gif
 	mv gif ~/.config/splash/exec/gif
 
-all: fidget img gif
+text:
+	@$(CC) source/text/text.cpp $(CFLAGS) $(LFLAGS) -lSDL2_ttf $(LINK) -o text
+	mv text ~/.config/splash/exec/text
+
+all: fidget img gif text

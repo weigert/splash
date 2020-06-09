@@ -8,14 +8,14 @@ int main( int argc, char* args[] ) {
 		return 0;
 	}
 
-	if(parse::in.prog == "--help"){
+	if(parse::in.flags["--help"]){
 		printhelp();
 		return 0;
 	}
 
-	std::vector<string>* lines;
+	vector<string>* lines = new vector<string>;
 	if(spipe::available())
-		lines = spipe::read();
+		spipe::read(lines);
 
 	Splash splash(parse::in);
 
@@ -33,10 +33,10 @@ int main( int argc, char* args[] ) {
 
 		event::input(splash);
 
-		if(parse::in.timeout){
+		if(parse::in.pflags["-t"]){
 			auto cur = std::chrono::high_resolution_clock::now();
 			int s = std::chrono::duration_cast<std::chrono::seconds>(cur - start).count();
-			if(s > parse::in.t){
+			if(s > stoi(parse::in.params["-t0"])){
 				logger::write("Killing splash");
 				event::active = false;
 			}
@@ -48,8 +48,8 @@ int main( int argc, char* args[] ) {
 		event::handle();
 
 		glXSwapBuffers(splash.Xdisplay, splash.gWindow);
-
 	}
 
+	delete p;
 	return 0;
 }

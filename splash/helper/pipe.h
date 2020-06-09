@@ -2,16 +2,20 @@ namespace spipe {
   using namespace std;
 
   bool available(){
-    return !isatty(fileno(stdin));
+    if(!isatty(fileno(stdin)))
+      return true;
+    logger::write("No piped data");
+    return false;
   }
 
-  vector<string>* read(){
-    vector<string>* lines = new vector<string>;
+  bool read(vector<string>* lines){
     string line;
+    lines->clear();
     while (getline(cin, line)){
       lines->push_back(line);
       logger::write("Piped Input: ", line);
     }
-    return lines;
+    cin.clear();
+    return lines->empty();
   }
 }
