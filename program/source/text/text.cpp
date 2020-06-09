@@ -10,16 +10,12 @@ private:
   Shader* shader;
   Texture* tex;
   int fontsize = 18;
-  string fontface = "font.ttf";
+  string fontface = ".ttf";
 
   int halign = 0; //0 = center, 1 = left, 2 = right
   int valign = 0; //0 = center, 1 = up, 2 = down
 
   glm::mat4 model = glm::mat4(1.0);
-
-  std::vector<string> fontdirs = {
-    "/usr/local/share/fonts"
-  };
 
   //Shader Sources
   const std::string vs_source =
@@ -35,6 +31,39 @@ public:
   Text(svec* s, parse::data* d):Program(s){
     TTF_Init();
 
+    if(d->pflags["-fs"])  //Font Size
+      fontsize = stoi(d->params["-fs0"]);
+
+    if(d->pflags["-ff"])
+      fontface = d->params["-ff0"];
+    else
+      logger::fatal("No font specified");
+
+    //Vertical Align
+    if(d->flags["--vu"])
+      valign = 1;
+    else if(d->flags["--vc"])
+      valign = 0;
+    else if(d->flags["--vd"])
+      valign = 2;
+
+    //Horizontal Align
+    if(d->flags["--hl"])
+      halign = 1;
+    else if(d->flags["--hc"])
+      halign = 0;
+    else if(d->flags["--hr"])
+      halign = 2;
+
+    unsigned int x = 0;
+    std::stringstream ss;
+
+    if(d->pflags["-fc"]){
+      ss << std::hex << d->params["-fc0"];
+      ss >> x;
+    }
+    glm::vec3 fc = glm::vec3(x%256, (x/(256))%256, (x/(256*256))%256);
+
     shader = new Shader({vs_source, fs_source}, {"in_Quad, in_Tex"}, true);
 
     if(s == NULL){
@@ -42,10 +71,27 @@ public:
       exit(0);
     }
 
-    TTF_Font* font = TTF_OpenFont(fontface.c_str(), fontsize);
+    int style = TTF_STYLE_NORMAL;
+    if(d->flags["--fu"])
+      style |= TTF_STYLE_UNDERLINE;
+    if(d->flags["--fs"])
+      style |= TTF_STYLE_STRIKETHROUGH;
+    if(d->flags["--fi"])
+      style |= TTF_STYLE_ITALIC;
+    if(d->flags["--fb"])
+      style |= TTF_STYLE_BOLD;
+
+    const char * home = getenv ("HOME");
+    if(home == NULL)
+      logger::fatal("Home environment variable not set");
+    fs::path fp = fs::path(home);
+
+    TTF_Font* font = TTF_OpenFont((fp/".fonts"/fontface).string().c_str(), fontsize);
     if(!font) logger::fatal("Couldn't open font");
 
-    SDL_Color colorf = { 0, 0, 0, 0 };
+    TTF_SetFontStyle(font, style);
+
+    SDL_Color colorf = {fc.x, fc.y, fc.z, 255 };
     SDL_Surface* surface = TTF_RenderText_Blended(font, s->back().c_str(), colorf);
     TTF_CloseFont(font);
 
