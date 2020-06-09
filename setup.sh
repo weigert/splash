@@ -26,16 +26,16 @@ cp config ~/.config/splash/config
 
 printf "Compile splash? [Y / N] "
 read b
-if [ $b = "Y" ];then
+if [ $b = "Y" ] || [ $b = "y" ];then
   echo "Compiling splash..."
   make -C "splash" splash
 fi
 
 printf "Compile example programs? [Y / N] "
 read b
-if [ $b == "Y" ]; then
+if [ $b == "Y" ] || [ $b = "y" ]; then
   echo "Compiling programs..."
   make -C "program" all
 fi
 
-printf "splash: Success"
+printf "splash: Success\n"
