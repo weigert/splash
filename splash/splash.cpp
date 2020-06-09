@@ -8,7 +8,7 @@ int main( int argc, char* args[] ) {
 		return 0;
 	}
 
-	if(parse::in.prog == "--help"){
+	if(parse::in.flags["--help"]){
 		printhelp();
 		return 0;
 	}
@@ -33,10 +33,10 @@ int main( int argc, char* args[] ) {
 
 		event::input(splash);
 
-		if(parse::in.timeout){
+		if(parse::in.params["-t"]){
 			auto cur = std::chrono::high_resolution_clock::now();
 			int s = std::chrono::duration_cast<std::chrono::seconds>(cur - start).count();
-			if(s > parse::in.t){
+			if(s > parse::in.params["-t"]){
 				logger::write("Killing splash");
 				event::active = false;
 			}
