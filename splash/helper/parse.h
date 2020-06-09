@@ -5,7 +5,8 @@ using namespace std;
   struct data{
 
     unordered_map<string, bool> flags;
-    unordered_map<string, int> params;
+    unordered_map<string, bool> pflags;
+    unordered_map<string, string> params;
 
     int x = 0, y = 0, w = 1920, h = 1080;
 
@@ -32,10 +33,11 @@ using namespace std;
 
       string p = "";
       for(int b = 0; k + b < ac; b++){
+        in.pflags[arg] = true;
         p = string(as[k+b]);
         if(p.substr(0, 1) == "-")
           break;
-        in.params[arg+to_string(b)] = stoi(p);
+        in.params[arg+to_string(b)] = p;
         n = k + b;
       }
     }
@@ -52,14 +54,16 @@ using namespace std;
     input(2, ac, as);
 
     //Do some necessary parsing
-    if(in.params["-p0"] != 0)
-      in.x = in.params["-p0"];
-    if(in.params["-p1"] != 0)
-      in.y = in.params["-p1"];
-    if(in.params["-p2"] != 0)
-      in.w = in.params["-p2"];
-    if(in.params["-p3"] != 0)
-      in.h = in.params["-p3"];
+    if(in.pflags["-p"])
+      in.x = stoi(in.params["-p0"]);
+    if(in.pflags["-p"])
+      in.y = stoi(in.params["-p1"]);
+    if(in.pflags["-p"])
+      in.w = stoi(in.params["-p2"]);
+    if(in.pflags["-p"])
+      in.h = stoi(in.params["-p3"]);
+
+    logger::verbose = in.flags["--v"];
   }
 
 };
