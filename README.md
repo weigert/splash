@@ -208,29 +208,34 @@ Add the following rules to your `~/.config/bspwm/bspwmrc`:
 This is necessary to make sure bspwm immediately floats splashes. Otherwise you get unintended behavior.
 
 ### i3 and i3-gaps
-Both of these window managers do not support the EWMH specification for specifying a preferred order of floating windows (specifically `_NET_WM_STATE_ABOVE` and `_NET_WM_STATE_BELOW`).
-
-These DEs seemingly work with two separate layers of windows (tiled and floating). Therefore, the `--bg` and `--fg` options do not work as intended (splashes will be permanently on the floating window layer). Splashes will never "disappear" behind tiled windows. Splashes will conflict with other floating windows too, and not stay above or below other windows.
-
-Additionally, i3 is not compatible with the Xfixes library and makes it difficult to disable user input / hover focus for the window, so the `--ni` flag will also not work. For some reason, i3 decides that a window with no input area has its entire area instead be it's border, so dragging on a splash after setting the `--ni` flag will instead resize it in a wonky way.
-
-All other options work as intended.
-
-If you never use other floating windows and use splash just for overlays, the program works as intended.
-
-See also:
-
-https://github.com/i3/i3/issues/3265
-
-I am thinking of a work around but it's a bit of work and requires an even deeper dive into X than the EWMH spec.
-
 Add this line to your i3 config to make splash semi-compatible:
 
     # splash config       
     for_window [class="SPLASH"] border none
     for_window [class="SPLASH"] floating enable
 
-The issues mentioned above will still persist, but splash will work for certain applications, and you can still get on-screen windowless opengl contexts as a floating window.
+A number of issues mentioned below will persist.
+
+#### i3 / i3-gaps compatibility problems
+Problem: These window managers do not support the EWMH specification for specifying a preferred order of floating windows (specifically `_NET_WM_STATE_ABOVE` and `_NET_WM_STATE_BELOW`). It ignores these hints and forces its own order.
+
+Effect: The `--bg` and `--fg` options do not work as intended (splashes will be permanently on the floating window layer). Splashes will never "disappear" behind tiled windows. Splashes will conflict with other floating windows too, and not stay above or below other windows.
+
+Problem: i3 does not seem to properly support the X shape extension.
+
+Effect: Disabling user input / hover focus for the window is non-standard (read: difficult), so the `--ni` flag will not work. For some reason, i3 decides that a window with no input area has its entire area instead be it's border, so dragging on a splash after setting the `--ni` flag will instead resize it in a wonky way.
+
+All other options work as intended. If you never use other floating windows and use splash just for overlays (with no click-through), the program works as intended.
+
+Currently this issue is *will not fix*, because it seems that it will require a substantial rewrite for a WM that does not follow the X spec. Consider forking and proposing a solution!
+
+Read the following discussion for possible fixes:
+
+https://github.com/weigert/splash/issues/7
+
+See also:
+
+https://github.com/i3/i3/issues/3265
 
 ## Customization & How it Works
 
