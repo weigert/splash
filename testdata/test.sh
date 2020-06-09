@@ -11,4 +11,4 @@ splash fidget -p 710 290 500 500 --ns --fg
 echo "canyon.png" | splash img -p 360 140 1200 800 --fg
 
 #Test displaying a clock!
-echo "dude i just literally wrote on your desktop background" | splash text --a --ns --ni -fs 32 -ff "Roboto-Bold.ttf"
+echo "dude i just literally wrote on your desktop background" | splash text --a --ns --ni -fs 32 -ff "Roboto-Bold.ttf" -fc 0xFF0000
