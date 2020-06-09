@@ -8,7 +8,7 @@ echo "smb.gif" | splash gif -p 660 340 600 400 --bg --ni --a --ns
 splash fidget -p 710 290 500 500 --ns --fg
 
 #Test displaying an image!
-echo "canyon.png" | splash img -p 360 140 1200 800
+echo "canyon.png" | splash img -p 360 140 1200 800 --fg
 
 #Test displaying a clock!
-date +%R | splash text -p 100 100 800 400 --ns --ni
+echo "dude i just literally wrote on your desktop background" | splash text --a --ns --ni -fs 32 -ff "Roboto-Bold.ttf"
