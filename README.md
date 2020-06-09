@@ -70,16 +70,8 @@ Program specific flags:
       -ff [font]    Font face (searches in ~/.fonts/, default "arial.ttf")
       -fc [hex]     Text color (hex code, e.g. 0xFFFFFF)
       -fs [size]    Font size, positive integer
-      --fi          Italic
-      --fb          Bold
-      --fu          Underlined
-      --fs          Strikethrough
-      --vu          Vertically align up
-      --vd          Vertically align down
-      --vc          Vertically align center (default)
-      --hl          Horizontally align left
-      --hr          Horizontally align right
-      --hc          Horizontally align center (default)
+      -v  [0,1,2]   Vertical Align [center, up, down]
+      -h  [0,1,2]   Horizontal Align [center, left, right]
 
 ### Examples
 Check the `/testdata/` folder for example programs to splash some data onto your screen.

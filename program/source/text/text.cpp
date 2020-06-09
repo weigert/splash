@@ -40,20 +40,12 @@ public:
       logger::fatal("No font specified");
 
     //Vertical Align
-    if(d->flags["--vu"])
-      valign = 1;
-    else if(d->flags["--vc"])
-      valign = 0;
-    else if(d->flags["--vd"])
-      valign = 2;
+    if(d->pflags["-v"])
+      valign = stoi(d->params["-v0"]);
 
     //Horizontal Align
-    if(d->flags["--hl"])
-      halign = 1;
-    else if(d->flags["--hc"])
-      halign = 0;
-    else if(d->flags["--hr"])
-      halign = 2;
+    if(d->pflags["-h"])
+      halign = stoi(d->params["-h0"]);
 
     unsigned int x = 0;
     std::stringstream ss;
