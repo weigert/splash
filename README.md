@@ -18,6 +18,10 @@ Example of splash displaying an animated GIF on the desktop background.
 
 Example of splash displaying a full 3D OpenGL application (albeit a very basic one) with user interaction.
 
+![ttf.gif](https://github.com/weigert/splash/blob/master/screenshots/ttf.gif)
+
+Example of splash rendering truetype font text, with a bunch of options, in the foreground on the desktop.
+
 This was originally written because I wanted to have a custom "splash screen" like those fancy, super expensive software packages have when starting up, with transparency and everything. Now it supports a full OpenGL context.
 
 ## Usage
