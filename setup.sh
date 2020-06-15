@@ -24,16 +24,14 @@ printf "Install location: $HOME/.config/splash\n"
 printf "Setting up configuration file\n"
 cp config ~/.config/splash/config
 
-printf "Compile splash? [Y / N] "
-read b
-if [ $b = "Y" ];then
+read -p "Compile splash? [Y / n] " b
+if [ $b == "Y" || -z "$b" ]; then
   echo "Compiling splash..."
   make -C "splash" splash
 fi
 
-printf "Compile example programs? [Y / N] "
-read b
-if [ $b == "Y" ]; then
+read -p "Compile example programs? [Y / n] " b
+if [ $b == "Y" || -z "$b" ]; then
   echo "Compiling programs..."
   make -C "program" all
 fi
