@@ -20,4 +20,13 @@ text:
 	@$(CC) source/text/text.cpp $(CFLAGS) $(LFLAGS) -lSDL2_ttf $(LINK) -o text
 	mv text ~/.config/splash/exec/text
 
-all: fidget img gif text
+# Alternative Fidget Spinners
+hairy:
+	@$(CC) source/hairy/fidget.cpp $(CFLAGS) $(LFLAGS) $(LINK) -o hairy
+	mv hairy ~/.config/splash/exec/hairy
+
+spiky:
+	@$(CC) source/spiky/fidget.cpp $(CFLAGS) $(LFLAGS) $(LINK) -o spiky
+	mv spiky ~/.config/splash/exec/spiky
+
+all: fidget img gif text hairy spiky

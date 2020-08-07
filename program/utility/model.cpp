@@ -34,7 +34,7 @@ struct Primitive{
   template<typename T>
   void bind(int index, int count, int size, T* data){
     glBindBuffer(GL_ARRAY_BUFFER, vbo[index]);
-    glBufferData(GL_ARRAY_BUFFER, count*sizeof(T), data, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, count*sizeof(T), data, GL_DYNAMIC_DRAW);
     attrib<T>(index, size);
   }
 
@@ -125,12 +125,12 @@ public:
   void update(){
     glBindVertexArray(vao);
     bind(0, positions.size(), 3, &positions[0]);
-    bind(1, normals.size(), 3, &normals[0]);
-    bind(2, colors.size(), 4, &colors[0]);
+    if(!normals.empty()) bind(1, normals.size(), 3, &normals[0]);
+    if(!colors.empty()) bind(2, colors.size(), 4, &colors[0]);
 
     SIZE = indices.size();
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, SIZE*sizeof(GLuint), &indices[0], GL_STATIC_DRAW);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, SIZE*sizeof(GLuint), &indices[0], GL_DYNAMIC_DRAW);
   }
 
   void construct(std::function<void(Model*)> constructor){
@@ -154,7 +154,7 @@ public:
     update();                   //Update VAO / VBO / IBO
   }
 
-  void render(GLenum mode = GL_TRIANGLES) const{
+  void render(GLenum mode = GL_TRIANGLES){
     glBindVertexArray(vao);
     if(indexed){
       glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);

@@ -49,6 +49,7 @@ public:
     shader->use();														//Prepare Shader
     shader->uniform("model", mesh.model);			//Set Model Matrix
     shader->uniform("vp", projection*camera);	//View Projection Matrix
+
     mesh.render(GL_LINES);									  //Render Model with Lines
   }
 
