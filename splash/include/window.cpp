@@ -15,6 +15,8 @@
 
 using namespace std;
 
+typedef GLXContext (*glXCreateContextAttribsARBProc)(Display*, GLXFBConfig, GLXContext, Bool, const int*);
+
 namespace event {
   bool active = true;
 }
@@ -49,6 +51,8 @@ public:
     //Options
     glLineWidth(2.0);
     glEnable(GL_BLEND);
+    glEnable(GL_DEPTH_TEST);
+    glDepthFunc(GL_LESS);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glEnable(GL_MULTISAMPLE);
     glViewport(0, 0, parse::in.w, parse::in.h);
@@ -276,7 +280,31 @@ void Splash::makeContext(){
 	if (!glXQueryExtension(Xdisplay, &dummy, &dummy))
     logger::fatal("X server does not support OpenGL");
 
+  /* //Non-Core Profile
+  int context_attribs[] = {
+        GLX_CONTEXT_MAJOR_VERSION_ARB, 3,
+        GLX_CONTEXT_MINOR_VERSION_ARB, 0,
+        None //Always Terminate with None
+  };
+
+  //Old Context Creation Style
   gContext = glXCreateNewContext(Xdisplay, fbconfig, GLX_RGBA_TYPE, 0, True);
+  */
+
+  //Core Profile Context
+  int context_attribs[] = {
+        GLX_CONTEXT_MAJOR_VERSION_ARB, 4,
+        GLX_CONTEXT_MINOR_VERSION_ARB, 0,
+        None //Always Terminate with None!
+        //https://www.khronos.org/registry/OpenGL/extensions/ARB/GLX_ARB_create_context.txt
+  };
+
+  glXCreateContextAttribsARBProc glXCreateContextAttribsARB = 0;
+  glXCreateContextAttribsARB = (glXCreateContextAttribsARBProc)
+  glXGetProcAddressARB( (const GLubyte *) "glXCreateContextAttribsARB" );
+  gContext = glXCreateContextAttribsARB( Xdisplay, fbconfig, 0,
+                                      True, context_attribs );
+
   if (!gContext)
     logger::fatal("Failed to create OpenGL context");
 
