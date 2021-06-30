@@ -1,73 +1,63 @@
 class Shader{
 public:
-  template<typename... Args>
   Shader(slist shaders, slist in){
     program = glCreateProgram();        //Generate Shader
     setup(shaders);                     //Add Individual Shaders
     for(auto &n : in)                   //Add all Attributes of Shader
       glBindAttribLocation(program, &n - in.begin(), n.c_str());
     link();                             //Link the shader program!
-  }
-
-  Shader(slist shaders, slist in){
-    program = glCreateProgram();        //Generate Shader
-    setup(shaders);                     //Add Individual Shaders
-    for(auto &n : in)                   //Add all Attributes of Shader
-      glBindAttribLocation(program, &n - in.begin(), n.c_str());
-    link();                             //Link the shader program!
-  }
-
-  Shader(slist shaders, slist in, slist buf):Shader(shaders, in){
-    for(auto&b : buf) addBuffer(b);     //Add Storage Buffers to Shader
   }
 
   Shader(slist shaders, slist in, bool source){
-  program = glCreateProgram();        //Generate Shader
+    program = glCreateProgram();        //Generate Shader
 
-  //Pre-Parsed Data
-  std::vector<std::string> _src = shaders;
+    std::vector<std::string> _src = shaders;
 
-  char* src;
-  int32_t size;
+    char* src;
+    int32_t size;
 
-  if(_src.size() == 2){
-    vertexShader = glCreateShader(GL_VERTEX_SHADER);
-    src = const_cast<char*>(_src[0].c_str());
-    size = _src[0].length();
-    glShaderSource(vertexShader, 1, &src, &size);
-    compile(vertexShader);
+    if(shaders.size() == 2){
 
-    fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-    src = const_cast<char*>(_src[1].c_str());
-    size = _src[1].length();
-    glShaderSource(fragmentShader, 1, &src, &size);
-    compile(fragmentShader);
+      vertexShader = glCreateShader(GL_VERTEX_SHADER);
+      src = const_cast<char*>(_src[0].c_str());
+      size = _src[0].length();
+      glShaderSource(vertexShader, 1, &src, &size);
+      compile(vertexShader);
+
+      fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
+      src = const_cast<char*>(_src[1].c_str());
+      size = _src[1].length();
+      glShaderSource(fragmentShader, 1, &src, &size);
+      compile(fragmentShader);
+
+    }
+    else if(shaders.size() == 3){
+
+      vertexShader = glCreateShader(GL_VERTEX_SHADER);
+      src = const_cast<char*>(_src[0].c_str());
+      size = _src[0].length();
+      glShaderSource(vertexShader, 1, &src, &size);
+      compile(vertexShader);
+
+      geometryShader = glCreateShader(GL_GEOMETRY_SHADER);
+      src = const_cast<char*>(_src[1].c_str());
+      size = _src[1].length();
+      glShaderSource(geometryShader, 1, &src, &size);
+      compile(geometryShader);
+
+      fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
+      src = const_cast<char*>(_src[2].c_str());
+      size = _src[2].length();
+      glShaderSource(fragmentShader, 1, &src, &size);
+      compile(fragmentShader);
+
+    }
+    else std::cout<<"Number of Shaders not Recognized"<<std::endl;
+
+    for(auto &n : in)                   //Add all Attributes of Shader
+      glBindAttribLocation(program, &n - in.begin(), n.c_str());
+    link();                             //Link the shader program!
   }
-
-  if(_src.size() == 3){
-    vertexShader = glCreateShader(GL_VERTEX_SHADER);
-    src = const_cast<char*>(_src[0].c_str());
-    size = _src[0].length();
-    glShaderSource(vertexShader, 1, &src, &size);
-    compile(vertexShader);
-
-    geometryShader = glCreateShader(GL_GEOMETRY_SHADER);
-    src = const_cast<char*>(_src[1].c_str());
-    size = _src[1].length();
-    glShaderSource(geometryShader, 1, &src, &size);
-    compile(geometryShader);
-
-    fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-    src = const_cast<char*>(_src[2].c_str());
-    size = _src[2].length();
-    glShaderSource(fragmentShader, 1, &src, &size);
-    compile(fragmentShader);
-  }
-
-  for(auto &n : in)                   //Add all Attributes of Shader
-    glBindAttribLocation(program, &n - in.begin(), n.c_str());
-  link();                             //Link the shader program!
-}
 
   ~Shader(){
     glDeleteProgram(program);
@@ -80,20 +70,15 @@ public:
   GLuint vertexShader, geometryShader, fragmentShader;
   int boundtextures;
 
-  std::unordered_map<std::string, GLuint> ssbo; //SSBO Storage
-  std::unordered_map<std::string, GLuint> sbpi; //Shader Binding Point Index
-
   void setup(slist shaders);
   int  addProgram(std::string fileName, GLenum shaderType);  //General Shader Addition
   std::string readGLSLFile(std::string fileName, int32_t &size); //Read File
-  void compile(GLuint shader);  //Compile and Add File
-  void link();                  //Link the entire program
+  bool compile(GLuint shader);  //Compile and Add File
+  bool link();                  //Link the entire program
   void error(GLuint s, bool t); //Get Compile/Link Error
   void use();                   //Use the program
-  void addBuffer(std::string name);                          //General Buffer Addition
 
   template<typename T> void texture(std::string name, const T& t);
-  template<typename T> void buffer(std::string name, std::vector<T>& buf, bool update = false);
   template<typename T> void uniform(std::string name, const T u);
   template<typename T, size_t N> void uniform(std::string name, const T (&u)[N]);
 };
@@ -121,24 +106,29 @@ int Shader::addProgram(std::string fileName, GLenum shaderType){
 
   int shaderID = glCreateShader(shaderType);
   glShaderSource(shaderID, 1, &src, &size);
-  compile(shaderID);
+  if(!compile(shaderID)){
+    std::cout<<"Failed to compile "<<fileName<<std::endl;
+  }
 
   return shaderID;
 }
 
-void Shader::compile(GLuint shader){
+bool Shader::compile(GLuint shader){
   glCompileShader(shader);
   int success;
   glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
   if(success) glAttachShader(program, shader);
   else        error(shader, true);
+//  std::cout<<"AYy"<<std::endl;
+  return success;
 }
 
-void Shader::link(){
+bool Shader::link(){
   glLinkProgram(program);
   int success;
   glGetProgramiv(program, GL_LINK_STATUS, &success);
   if(!success) error(program, false);
+  return success;
 }
 
 void Shader::error(GLuint s, bool t){
@@ -172,28 +162,6 @@ std::string Shader::readGLSLFile(std::string file, int32_t &size){
 
   size = fileContent.length();  //Set the Size
   return fileContent;
-}
-
-/* Shader Storage Buffer Objects */
-
-void Shader::addBuffer(std::string name){
-  unsigned int b;
-  glGenBuffers(1, &b);
-  glBindBuffer(GL_SHADER_STORAGE_BUFFER, b);
-  glShaderStorageBlockBinding(program, glGetProgramResourceIndex(program, GL_SHADER_STORAGE_BLOCK, name.c_str()), ssbo.size());
-  glBindBufferBase(GL_SHADER_STORAGE_BUFFER, ssbo.size(), b);
-  sbpi[name] = ssbo.size();
-  ssbo[name] = b;
-  glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
-}
-
-template<typename T>
-void Shader::buffer(std::string name, std::vector<T>& buf, bool update){
-  glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssbo[name]);
-  if(update) glBufferSubData(GL_SHADER_STORAGE_BUFFER, 0, buf.size()*sizeof(T), &buf[0]);
-  else glBufferData(GL_SHADER_STORAGE_BUFFER, buf.size()*sizeof(T), &buf[0], GL_STATIC_DRAW);
-  glBindBufferBase(GL_SHADER_STORAGE_BUFFER, sbpi[name], ssbo[name]);
-  glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
 }
 
 /* Uniform Setters */

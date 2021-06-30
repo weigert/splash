@@ -65,17 +65,17 @@ struct Primitive{
   }
 };
 
-template<>
-void Primitive::attrib<GLfloat>(int index, int size){
-  glEnableVertexAttribArray(index);
-  glVertexAttribPointer(index, size, GL_FLOAT, GL_FALSE, 0, 0);
-}
-
-//Primitive Shapes (Pre-Made)
+struct Point: Primitive{
+  GLfloat vert[3] = {0.0, 0.0, 0.0};
+  Point():Primitive(){
+    bind(0, 3, 3, &vert[0]);
+    SIZE = 1;
+  }
+};
 
 struct Square2D: Primitive{
-  GLfloat vert[8] = {-1.0,  1.0, -1.0, -1.0,  1.0,  1.0,  1.0, -1.0};
-  GLfloat tex [8] = { 0.0,  0.0,  0.0,  1.0,  1.0,  0.0,  1.0,  1.0};
+  GLfloat vert[8] = {-1.0, -1.0,  1.0, -1.0, -1.0,  1.0,  1.0,  1.0};
+  GLfloat tex [8] = { 0.0,  1.0,  1.0,  1.0,  0.0,  0.0,  1.0,  0.0};
 
   Square2D():Primitive(){
     bind(0, 8, 2, &vert[0]);
@@ -90,6 +90,40 @@ struct Square3D: Primitive{
   Square3D():Primitive(){
     bind(0, 12, 3, &vert[0]);
     bind(1, 8,  2, &tex[0]);
+  }
+};
+
+struct Cube: Primitive{
+  GLfloat vert[144] = { /* Front */ 1.0, -1.0,  1.0,  1.0,  1.0,  1.0, -1.0,  1.0,  1.0, -1.0,  1.0,  1.0, -1.0, -1.0,  1.0,  1.0, -1.0,  1.0,
+                        /* Back  */-1.0,  1.0, -1.0,  1.0,  1.0, -1.0,  1.0, -1.0, -1.0,  1.0, -1.0, -1.0, -1.0, -1.0, -1.0, -1.0,  1.0, -1.0,
+                        /* Left  */-1.0, -1.0,  1.0, -1.0,  1.0,  1.0, -1.0,  1.0, -1.0, -1.0,  1.0, -1.0, -1.0, -1.0, -1.0, -1.0, -1.0,  1.0,
+                        /* Right */ 1.0,  1.0, -1.0,  1.0,  1.0,  1.0,  1.0, -1.0,  1.0,  1.0, -1.0,  1.0,  1.0, -1.0, -1.0,  1.0,  1.0, -1.0,
+                        /* Top   */-1.0,  1.0,  1.0,  1.0,  1.0,  1.0,  1.0,  1.0, -1.0,  1.0,  1.0, -1.0, -1.0,  1.0, -1.0, -1.0,  1.0,  1.0,
+                        /* Bottom*/ 1.0, -1.0, -1.0,  1.0, -1.0,  1.0, -1.0, -1.0,  1.0, -1.0, -1.0,  1.0, -1.0, -1.0, -1.0,  1.0, -1.0, -1.0 };
+  GLfloat tex [8]   = { 0.0,  0.0,  0.0,  1.0,  1.0,  0.0,  1.0,  1.0};
+
+  Cube():Primitive(){
+    bind(0, 144, 3, &vert[0]);
+    bind(1, 8,  2, &tex[0]);
+    SIZE = 36;
+  }
+};
+
+struct Gizmo: Primitive{
+  GLfloat vert[18] = {
+    0.0, 0.0, 0.0, 1.0, 0.0, 0.0,
+    0.0, 0.0, 0.0, 0.0, 1.0, 0.0,
+    0.0, 0.0, 0.0, 0.0, 0.0, 1.0
+  };
+  GLfloat tex [18] = {
+    1.0, 0.0, 0.0, 1.0, 0.0, 0.0,
+    0.0, 1.0, 0.0, 0.0, 1.0, 0.0,
+    0.0, 0.0, 1.0, 0.0, 0.0, 1.0
+  };
+  Gizmo():Primitive(){
+    bind(0, 18, 3, &vert[0]);
+    bind(1, 18, 3, &tex[0]);
+    SIZE = 6;
   }
 };
 
@@ -139,8 +173,8 @@ public:
     colors.clear();
     indices.clear();
 
-    (constructor)(this);  //Call user-defined constructor
-    update();                //Update VAO / VBO / IBO
+    (constructor)(this);        //Call user-defined constructor
+    update();                   //Update VAO / VBO / IBO
   }
 
   template<typename... T>
@@ -162,4 +196,28 @@ public:
     }
     else glDrawArrays(mode, 0, positions.size()/3);
   }
+
+  template<typename D>
+  void add(std::vector<GLfloat>& v, D a);
 };
+
+template<>
+void Primitive::attrib<GLfloat>(int index, int size){
+  glEnableVertexAttribArray(index);
+  glVertexAttribPointer(index, size, GL_FLOAT, GL_FALSE, 0, 0);
+}
+
+template<>
+void Model::add<glm::vec3>(std::vector<GLfloat>& v, glm::vec3 a){
+  v.push_back(a.x);
+  v.push_back(a.y);
+  v.push_back(a.z);
+}
+
+template<>
+void Model::add<glm::vec4>(std::vector<GLfloat>& v, glm::vec4 a){
+  v.push_back(a.x);
+  v.push_back(a.y);
+  v.push_back(a.z);
+  v.push_back(a.w);
+}
