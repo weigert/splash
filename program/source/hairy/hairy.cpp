@@ -5,19 +5,19 @@ private:
 
   //Shader Source
   const std::string vs_source =
-    #include "shader/fidget.vs"
+    #include "fidget.vs"
   ;
   const std::string fs_source =
-    #include "shader/fidget.fs"
+    #include "fidget.fs"
   ;
   const std::string gs_source =
-    #include "shader/fidget.gs"
+    #include "fidget.gs"
   ;
   const std::string vs_solid =
-    #include "shader/solid.vs"
+    #include "solid.vs"
   ;
   const std::string fs_solid =
-    #include "shader/solid.fs"
+    #include "solid.fs"
   ;
 
   //Utility Classes
@@ -54,7 +54,9 @@ public:
 
     mesh.construct(_build);
 
-    split(&mesh);
+    //Split and Update
+    for(int i = 0; i < 3; i++)
+      split(&mesh);
     mesh.update();
   }
 
@@ -100,8 +102,12 @@ public:
     rot[2] += vrot[2];
   }
 
+  virtual void onpipe(std::string s){
+    /* ... */
+  }
+
   ~Fidget(){
-    delete effect;
+  //  delete effect;
     delete solid;
   }
 

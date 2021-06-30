@@ -14,10 +14,10 @@ private:
     #include "fidget.gs"
   ;
   const std::string vs_solid =
-    #include "shader/solid.vs"
+    #include "solid.vs"
   ;
   const std::string fs_solid =
-    #include "shader/solid.fs"
+    #include "solid.fs"
   ;
 
   //Utility Classes
@@ -54,9 +54,7 @@ public:
 
     mesh.construct(_build);
 
-    //Split and Update
-    for(int i = 0; i < 3; i++)
-      split(&mesh);
+    split(&mesh);
     mesh.update();
   }
 
@@ -100,6 +98,10 @@ public:
     rot[0] += vrot[0];
     rot[1] += vrot[1];
     rot[2] += vrot[2];
+  }
+
+  virtual void onpipe(std::string s){
+    /* ... */
   }
 
   ~Fidget(){

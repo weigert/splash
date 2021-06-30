@@ -53,6 +53,10 @@ public:
     /* ... */
   }
 
+  virtual void onpipe(std::string s){
+    /* ... */
+  }
+
   ~Image(){
       delete shader;
       for(auto& t: tex)

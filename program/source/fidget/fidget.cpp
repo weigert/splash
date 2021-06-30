@@ -72,6 +72,10 @@ public:
     rot[2] += vrot[2];
   }
 
+  virtual void onpipe(std::string s){
+    /* ... */
+  }
+
   ~Fidget(){
       delete shader;
   }
@@ -114,9 +118,9 @@ public:
     h->positions.push_back(0);
 
     for(int i = 0; i < 12; i++){
-      h->normals.push_back(0.0);
-      h->normals.push_back(0.0);
-      h->normals.push_back(0.0);
+      h->normals.push_back(1.0);
+      h->normals.push_back(1.0);
+      h->normals.push_back(1.0);
     }
 
     h->indices.push_back(1);
