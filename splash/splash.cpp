@@ -8,8 +8,13 @@ int main( int argc, char* args[] ) {
 		return 0;
 	}
 
-	if(parse::in.flags["--help"]){
-		printhelp();
+	if(parse::in.prog == "help"){
+		logger::raw(help);
+		return 0;
+	}
+
+	if(parse::in.prog == "info"){
+		logger::raw(info);
 		return 0;
 	}
 
@@ -23,11 +28,14 @@ int main( int argc, char* args[] ) {
 	if(home == NULL)
 		logger::fatal("Home environment variable not set");
 	fs::path fp = fs::path(home);
+
 	Program* p = Program::get((fp/".config/splash/exec"/parse::in.prog).string(), lines, &parse::in);
 	if(p == NULL)
 		logger::fatal("Couldn't load program", parse::in.prog);
 
 	auto start = std::chrono::high_resolution_clock::now();
+
+	signal(SIGINT, &sighandler);
 
 	while(event::active){
 
@@ -45,11 +53,14 @@ int main( int argc, char* args[] ) {
 		p->pipeline();					//Execute the Program
 		p->event(event::data);	//Program Event Handling
 
+		std::string line = spipe::fifo(p->fpipe);
+		if(!line.empty()) p->onpipe(line);
+
 		event::handle();
 
 		glXSwapBuffers(splash.Xdisplay, splash.gWindow);
 	}
 
-	delete p;
+	Program::destroy(p);
 	return 0;
 }

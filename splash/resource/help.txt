@@ -1,0 +1,53 @@
+R""(
+Splash requires specification of an execution mode.
+
+    Reading:
+      []      Required
+      <>      Optional
+
+    <data |> splash [mode] <options/flags>
+
+    Modes (built-in):
+
+      help      Display help message
+
+      fidget    Display a 3D fidget spinner (lol)
+      <data>:   None
+
+      img       Display .png image
+      [data]:   Image file name
+
+      gif       Display .gif image
+      [data]:   GIF file name
+      Note:     Only works for full replacing gifs!
+
+      text      Render truetype text (static)
+      [data]:   Text to render
+
+    Options:
+
+      -p [x y w h]  Position Splash Quad
+      -t [s]        Splash timeout in seconds (integer)
+
+    Flags:
+
+      --t     Test configuration file
+      --v     Verbose mode
+
+      --bg    Place splash in background
+      --fg    Place splash in foreground (default)
+      --ni    Splash no-interact
+      --ns    Disable splash shadows (compton)
+      --a     Display splash on all desktops
+
+Program specific flags:
+
+      text
+
+      -ff [font]    Font face (searches in ~/.fonts/, default "arial.ttf")
+      -fc [hex]     Text color (hex code, e.g. 0xFFFFFF)
+      -fs [size]    Font size, positive integer
+      -v  [0,1,2]   Vertical Align [center, up, down]
+      -h  [0,1,2]   Horizontal Align [center, left, right]
+
+)""

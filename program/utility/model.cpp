@@ -34,7 +34,7 @@ struct Primitive{
   template<typename T>
   void bind(int index, int count, int size, T* data){
     glBindBuffer(GL_ARRAY_BUFFER, vbo[index]);
-    glBufferData(GL_ARRAY_BUFFER, count*sizeof(T), data, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, count*sizeof(T), data, GL_DYNAMIC_DRAW);
     attrib<T>(index, size);
   }
 
@@ -65,17 +65,17 @@ struct Primitive{
   }
 };
 
-template<>
-void Primitive::attrib<GLfloat>(int index, int size){
-  glEnableVertexAttribArray(index);
-  glVertexAttribPointer(index, size, GL_FLOAT, GL_FALSE, 0, 0);
-}
-
-//Primitive Shapes (Pre-Made)
+struct Point: Primitive{
+  GLfloat vert[3] = {0.0, 0.0, 0.0};
+  Point():Primitive(){
+    bind(0, 3, 3, &vert[0]);
+    SIZE = 1;
+  }
+};
 
 struct Square2D: Primitive{
-  GLfloat vert[8] = {-1.0,  1.0, -1.0, -1.0,  1.0,  1.0,  1.0, -1.0};
-  GLfloat tex [8] = { 0.0,  0.0,  0.0,  1.0,  1.0,  0.0,  1.0,  1.0};
+  GLfloat vert[8] = {-1.0, -1.0,  1.0, -1.0, -1.0,  1.0,  1.0,  1.0};
+  GLfloat tex [8] = { 0.0,  1.0,  1.0,  1.0,  0.0,  0.0,  1.0,  0.0};
 
   Square2D():Primitive(){
     bind(0, 8, 2, &vert[0]);
@@ -90,6 +90,40 @@ struct Square3D: Primitive{
   Square3D():Primitive(){
     bind(0, 12, 3, &vert[0]);
     bind(1, 8,  2, &tex[0]);
+  }
+};
+
+struct Cube: Primitive{
+  GLfloat vert[144] = { /* Front */ 1.0, -1.0,  1.0,  1.0,  1.0,  1.0, -1.0,  1.0,  1.0, -1.0,  1.0,  1.0, -1.0, -1.0,  1.0,  1.0, -1.0,  1.0,
+                        /* Back  */-1.0,  1.0, -1.0,  1.0,  1.0, -1.0,  1.0, -1.0, -1.0,  1.0, -1.0, -1.0, -1.0, -1.0, -1.0, -1.0,  1.0, -1.0,
+                        /* Left  */-1.0, -1.0,  1.0, -1.0,  1.0,  1.0, -1.0,  1.0, -1.0, -1.0,  1.0, -1.0, -1.0, -1.0, -1.0, -1.0, -1.0,  1.0,
+                        /* Right */ 1.0,  1.0, -1.0,  1.0,  1.0,  1.0,  1.0, -1.0,  1.0,  1.0, -1.0,  1.0,  1.0, -1.0, -1.0,  1.0,  1.0, -1.0,
+                        /* Top   */-1.0,  1.0,  1.0,  1.0,  1.0,  1.0,  1.0,  1.0, -1.0,  1.0,  1.0, -1.0, -1.0,  1.0, -1.0, -1.0,  1.0,  1.0,
+                        /* Bottom*/ 1.0, -1.0, -1.0,  1.0, -1.0,  1.0, -1.0, -1.0,  1.0, -1.0, -1.0,  1.0, -1.0, -1.0, -1.0,  1.0, -1.0, -1.0 };
+  GLfloat tex [8]   = { 0.0,  0.0,  0.0,  1.0,  1.0,  0.0,  1.0,  1.0};
+
+  Cube():Primitive(){
+    bind(0, 144, 3, &vert[0]);
+    bind(1, 8,  2, &tex[0]);
+    SIZE = 36;
+  }
+};
+
+struct Gizmo: Primitive{
+  GLfloat vert[18] = {
+    0.0, 0.0, 0.0, 1.0, 0.0, 0.0,
+    0.0, 0.0, 0.0, 0.0, 1.0, 0.0,
+    0.0, 0.0, 0.0, 0.0, 0.0, 1.0
+  };
+  GLfloat tex [18] = {
+    1.0, 0.0, 0.0, 1.0, 0.0, 0.0,
+    0.0, 1.0, 0.0, 0.0, 1.0, 0.0,
+    0.0, 0.0, 1.0, 0.0, 0.0, 1.0
+  };
+  Gizmo():Primitive(){
+    bind(0, 18, 3, &vert[0]);
+    bind(1, 18, 3, &tex[0]);
+    SIZE = 6;
   }
 };
 
@@ -125,12 +159,12 @@ public:
   void update(){
     glBindVertexArray(vao);
     bind(0, positions.size(), 3, &positions[0]);
-    bind(1, normals.size(), 3, &normals[0]);
-    bind(2, colors.size(), 4, &colors[0]);
+    if(!normals.empty()) bind(1, normals.size(), 3, &normals[0]);
+    if(!colors.empty()) bind(2, colors.size(), 4, &colors[0]);
 
     SIZE = indices.size();
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, SIZE*sizeof(GLuint), &indices[0], GL_STATIC_DRAW);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, SIZE*sizeof(GLuint), &indices[0], GL_DYNAMIC_DRAW);
   }
 
   void construct(std::function<void(Model*)> constructor){
@@ -139,8 +173,8 @@ public:
     colors.clear();
     indices.clear();
 
-    (constructor)(this);  //Call user-defined constructor
-    update();                //Update VAO / VBO / IBO
+    (constructor)(this);        //Call user-defined constructor
+    update();                   //Update VAO / VBO / IBO
   }
 
   template<typename... T>
@@ -154,7 +188,7 @@ public:
     update();                   //Update VAO / VBO / IBO
   }
 
-  void render(GLenum mode = GL_TRIANGLES) const{
+  void render(GLenum mode = GL_TRIANGLES){
     glBindVertexArray(vao);
     if(indexed){
       glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
@@ -162,4 +196,28 @@ public:
     }
     else glDrawArrays(mode, 0, positions.size()/3);
   }
+
+  template<typename D>
+  void add(std::vector<GLfloat>& v, D a);
 };
+
+template<>
+void Primitive::attrib<GLfloat>(int index, int size){
+  glEnableVertexAttribArray(index);
+  glVertexAttribPointer(index, size, GL_FLOAT, GL_FALSE, 0, 0);
+}
+
+template<>
+void Model::add<glm::vec3>(std::vector<GLfloat>& v, glm::vec3 a){
+  v.push_back(a.x);
+  v.push_back(a.y);
+  v.push_back(a.z);
+}
+
+template<>
+void Model::add<glm::vec4>(std::vector<GLfloat>& v, glm::vec4 a){
+  v.push_back(a.x);
+  v.push_back(a.y);
+  v.push_back(a.z);
+  v.push_back(a.w);
+}

@@ -49,6 +49,7 @@ public:
     shader->use();														//Prepare Shader
     shader->uniform("model", mesh.model);			//Set Model Matrix
     shader->uniform("vp", projection*camera);	//View Projection Matrix
+
     mesh.render(GL_LINES);									  //Render Model with Lines
   }
 
@@ -69,6 +70,10 @@ public:
     rot[0] += vrot[0];
     rot[1] += vrot[1];
     rot[2] += vrot[2];
+  }
+
+  virtual void onpipe(std::string s){
+    /* ... */
   }
 
   ~Fidget(){
@@ -113,9 +118,9 @@ public:
     h->positions.push_back(0);
 
     for(int i = 0; i < 12; i++){
-      h->normals.push_back(0.0);
-      h->normals.push_back(0.0);
-      h->normals.push_back(0.0);
+      h->normals.push_back(1.0);
+      h->normals.push_back(1.0);
+      h->normals.push_back(1.0);
     }
 
     h->indices.push_back(1);

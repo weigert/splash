@@ -16,17 +16,43 @@ public:
     char* src;
     int32_t size;
 
-    vertexShader = glCreateShader(GL_VERTEX_SHADER);
-    src = const_cast<char*>(_src[0].c_str());
-    size = _src[0].length();
-    glShaderSource(vertexShader, 1, &src, &size);
-    compile(vertexShader);
+    if(shaders.size() == 2){
 
-    fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-    src = const_cast<char*>(_src[1].c_str());
-    size = _src[1].length();
-    glShaderSource(fragmentShader, 1, &src, &size);
-    compile(fragmentShader);
+      vertexShader = glCreateShader(GL_VERTEX_SHADER);
+      src = const_cast<char*>(_src[0].c_str());
+      size = _src[0].length();
+      glShaderSource(vertexShader, 1, &src, &size);
+      compile(vertexShader);
+
+      fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
+      src = const_cast<char*>(_src[1].c_str());
+      size = _src[1].length();
+      glShaderSource(fragmentShader, 1, &src, &size);
+      compile(fragmentShader);
+
+    }
+    else if(shaders.size() == 3){
+
+      vertexShader = glCreateShader(GL_VERTEX_SHADER);
+      src = const_cast<char*>(_src[0].c_str());
+      size = _src[0].length();
+      glShaderSource(vertexShader, 1, &src, &size);
+      compile(vertexShader);
+
+      geometryShader = glCreateShader(GL_GEOMETRY_SHADER);
+      src = const_cast<char*>(_src[1].c_str());
+      size = _src[1].length();
+      glShaderSource(geometryShader, 1, &src, &size);
+      compile(geometryShader);
+
+      fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
+      src = const_cast<char*>(_src[2].c_str());
+      size = _src[2].length();
+      glShaderSource(fragmentShader, 1, &src, &size);
+      compile(fragmentShader);
+
+    }
+    else std::cout<<"Number of Shaders not Recognized"<<std::endl;
 
     for(auto &n : in)                   //Add all Attributes of Shader
       glBindAttribLocation(program, &n - in.begin(), n.c_str());
@@ -47,8 +73,8 @@ public:
   void setup(slist shaders);
   int  addProgram(std::string fileName, GLenum shaderType);  //General Shader Addition
   std::string readGLSLFile(std::string fileName, int32_t &size); //Read File
-  void compile(GLuint shader);  //Compile and Add File
-  void link();                  //Link the entire program
+  bool compile(GLuint shader);  //Compile and Add File
+  bool link();                  //Link the entire program
   void error(GLuint s, bool t); //Get Compile/Link Error
   void use();                   //Use the program
 
@@ -80,24 +106,29 @@ int Shader::addProgram(std::string fileName, GLenum shaderType){
 
   int shaderID = glCreateShader(shaderType);
   glShaderSource(shaderID, 1, &src, &size);
-  compile(shaderID);
+  if(!compile(shaderID)){
+    std::cout<<"Failed to compile "<<fileName<<std::endl;
+  }
 
   return shaderID;
 }
 
-void Shader::compile(GLuint shader){
+bool Shader::compile(GLuint shader){
   glCompileShader(shader);
   int success;
   glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
   if(success) glAttachShader(program, shader);
   else        error(shader, true);
+//  std::cout<<"AYy"<<std::endl;
+  return success;
 }
 
-void Shader::link(){
+bool Shader::link(){
   glLinkProgram(program);
   int success;
   glGetProgramiv(program, GL_LINK_STATUS, &success);
   if(!success) error(program, false);
+  return success;
 }
 
 void Shader::error(GLuint s, bool t){

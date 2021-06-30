@@ -13,6 +13,6 @@ using svec = std::vector<std::string>;
 
 #include "utility/texture.cpp"
 #include "utility/model.cpp"
-#include "utility/particle.cpp"
+#include "utility/instance.cpp"
 #include "utility/shader.cpp"
 #include "utility/target.cpp"
