@@ -4,7 +4,6 @@
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 HOME=/home/$(echo $DIR | cut -d/ -f3)
 
-
 # Setup script for splash
 printf "Setting up splash...\n"
 
@@ -13,9 +12,13 @@ if [ -d "$HOME/.config/splash" ]; then
   if ! [ -d "$HOME/.config/splash/exec" ]; then
     mkdir "$HOME/.config/splash/exec"
   fi
+  if ! [ -d "$HOME/.config/splash/pipe" ]; then
+    mkdir "$HOME/.config/splash/pipe"
+  fi
 else
   mkdir "$HOME/.config/splash"
   mkdir "$HOME/.config/splash/exec"
+  mkdir "$HOME/.config/splash/pipe"
 fi
 printf "done!\n"
 printf "Install location: $HOME/.config/splash\n"
