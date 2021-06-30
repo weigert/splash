@@ -18,4 +18,33 @@ namespace spipe {
     cin.clear();
     return lines->empty();
   }
+
+  std::string next(){
+    int n = 0;
+
+    const char * home = getenv ("HOME");
+    fs::path fp = fs::path(home);
+    while(fs::exists(root/"pipe"/("pipe"+std::to_string(n))))
+      n++;
+
+    return ("pipe"+std::to_string(n));
+  }
+
+  std::string fifo(int fpipe){
+
+    std::string line;
+    char buf[256] = {""};
+
+    int m = 0;
+    int n = ::read(fpipe, buf, sizeof(buf));
+    while(n > 0){
+      line += buf;
+      m += n;
+      n = ::read(fpipe, buf, sizeof(buf));
+    }
+
+    return line.substr(0, m-1);
+
+  }
+
 }
