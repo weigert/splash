@@ -24,32 +24,25 @@ Example of splash rendering truetype font text, with a bunch of options, in the 
 
 This was originally written because I wanted to have a custom "splash screen" like those fancy, super expensive software packages have when starting up, with transparency and everything. Now it supports a full OpenGL context.
 
+### Features
+
+splash rovides an elegant interface for creating a light-weight, "windowless" OpenGL context on your desktop. It also provides a simply system for accessing command line options and access to a pipe for streaming data to the visualization. Programs are dynamically linked so splash is very easy to extend (see below for details). The structure thereby allows for the development of light-weight, highly modular shader based desktop visuals.
+
+    - dynamically linked, shader-based execution modes
+    - super light code structure and execution cost
+    - streaming data to exeuction modes via pipes
+    - easy to develpo new execution modes
+
 ## Usage
 
-Splash requires specification of an execution mode.
+splash requires specification of an execution mode, which can then use piped data as well as options:
 
     Reading:
       []      Required
       <>      Optional
 
+    Running:
     <data |> splash [mode] <options/flags>
-
-    Modes (built-in):
-
-      help      Display help message
-
-      fidget    Display a 3D fidget spinner (lol)
-      <data>:   None
-
-      img       Display .png image
-      [data]:   Image file name
-
-      gif       Display .gif image
-      [data]:   GIF file name
-      Note:     Only works for full replacing gifs!
-
-      text      Render truetype text (static)
-      [data]:   Text to render
 
     Options:
 
@@ -67,34 +60,51 @@ Splash requires specification of an execution mode.
       --ns    Disable splash shadows (compton)
       --a     Display splash on all desktops
 
-Program specific flags:
+    Modes (included by default):
 
-      text
+      help      Display help message (this message)
+      info      Display info message
 
-      -ff [font]    Font face (searches in ~/.fonts/, default "arial.ttf")
-      -fc [hex]     Text color (hex code, e.g. 0xFFFFFF)
-      -fs [size]    Font size, positive integer
-      -v  [0,1,2]   Vertical Align [center, up, down]
-      -h  [0,1,2]   Horizontal Align [center, left, right]
+      fidget    Display a 3D fidget spinner (lol)
+      hairy     A different fidget spinner
+      spiky     Yet another different spinner
+
+      img       Display .png image
+      [data]:   Image file name
+
+      gif       Display .gif image (note: only full replacing gifs)
+      [data]:   GIF file name
+
+      text      Render truetype text (static)
+      [data]:   Text to render
+        -ff [font]    Font face (searches in ~/.fonts/, default "arial.ttf")
+        -fc [hex]     Text color (hex code, e.g. 0xFFFFFF)
+        -fs [size]    Font size, positive integer
+        -v  [0,1,2]   Vertical Align [center, up, down]
+        -h  [0,1,2]   Horizontal Align [center, left, right]
+
+### Data Piping
+
+Data can be piped into a splash directly at the start, using e.g.:
+
+    echo "splash" | splash text -p 100 100 800 400 --bg --ns  -ff "arial.ttf" -fs 100
+    
+Every splash program will also additionally open a numbered named pipe in `~/.config/splash/pipe/`, on which it (can) listen for data stream to affect the visualization. The name of the pipe is returned by splash:
+
+    > splash text -p 100 100 800 400 --bg --ns  -ff "arial.ttf" -fs 100
+    $ /home/user/.config/splash/pipe/pipe0
+    
+which can then be used to stream data from another source, e.g.:
+
+    > watch -n1 'date +%H:%M:%S > /home/user/.config/splash/pipe/pipe0'
+
+resulting in a clock visualized in the splash opened previously with the correct settings.
+
+Note that what happens with the data depends on the programming of the execution mode.
 
 ### Examples
-Check the `/testdata/` folder for example programs to splash some data onto your screen.
 
-      #Default desktop fidget spinner (no shadow, foreground)
-
-        splash fidget -p 710 290 500 500 --ns --fg
-
-      #Animated SMB wallpaper gif (no interact, all screens, no shadow)
-
-        echo "smb.gif" | splash gif -p 660 340 600 400 --bg --ni --a --ns
-
-      #Display an Image (with shading, blocks mouse input)
-
-        echo "image.png" | splash img -p 360 140 1200 800
-
-      #Display some text on your background
-
-        echo "splash" | splash text -p 100 100 800 400 --bg --ns  -ff "arial.ttf" -fs 100
+To test your installation of splash and see some application examples, check the `test` folder. It comes with some data provided.
 
 ## Installation
 
@@ -121,14 +131,19 @@ The execution modes are placed in `~/.config/splash/exec` and splash is placed i
 
 If you wish to compile manually, use the makefiles in `splash/Makefile` and `program/Makefile`:
 
-    ./splash:
-      make splash
+    # ./splash:
+      make build
+      sudo make install
+    # or
+      sudo make splash
 
-    ./program:
-      make [mode]
+    # ./program:
+      make build
+      make install
+    # or
       make all
 
-Note that splash is separate from the actual execution modes. Execution modes are compiled separately (linked at runtime by splash).
+Note that splash is separate from the actual execution modes. Execution modes are compiled separately (linked at runtime by splash). Execution mode installation does not require privilege.
 
 #### Compilation Issues
 
@@ -158,76 +173,9 @@ Desktop Environments:
 
         ...                 Feel free to open an issue for your DE!
 
-**Note**: Some WMs require additions to their config (see below)
+**Note**: Some WMs require additions to their config.
 
-*Sidenote*: The various degrees of compatibility depend on how strictly the window manager conforms to the X11 extended window manager hints specification ([EWMH](https://specifications.freedesktop.org/wm-spec/wm-spec-latest.html)). Particularly tiling window managers don't adhere entirely, making it more difficult to produce consistent splash behavior. There are work-arounds using the WM configs.
-
-### Splash xprops
-Splash will spawn an X window with a number of additional properties that your WM / compositor / other programs can target to get expected visual behavior:
-
-      SPLASH_SHADOW = [0,1]       set to 0 if --ns is set (1 by default)
-      WM_CLASS = SPLASH           for every window spawned with splah
-      WM_NAME = SPLASH
-
-**Note**: You might want shadow on for a splash for e.g. an image overlay.
-
-### Compositor config
-To enable shadow toggling, add the following rule (or similar) to your compositor config (e.g. `~/.config/compton.conf`):
-
-    #Enable shadow toggling
-    shadow-exclude = [
-      #...
-      "SPLASH_SHADOW@:32c = 0",
-      #...
-    ];
-    #...__
-
-If you don't add this the compositor **will always** shade splashes, and it can't be deactivated with `--ns`.
-
-Other compositors (check where to set shadow exclude rule):
-
-[Picom](https://wiki.archlinux.org/index.php/Picom)
-
-**Note**: Other compositors might support features such as kawase blur. Use the same flag above to target splash for exception.
-
-### bspwm
-Add the following rules to your `~/.config/bspwm/bspwmrc`:
-
-    # Splash Float
-    bspc rule -a SPLASH:SPLASH state=floating
-    bspc rule -a SPLASH:SPLASH border=off
-
-This is necessary to make sure bspwm immediately floats splashes. Otherwise you get unintended behavior.
-
-### i3 and i3-gaps
-Add this line to your i3 config to make splash semi-compatible:
-
-    # splash config       
-    for_window [class="SPLASH"] border none
-    for_window [class="SPLASH"] floating enable
-
-A number of issues mentioned below will persist.
-
-#### i3 / i3-gaps compatibility problems
-Problem: These window managers do not support the EWMH specification for specifying a preferred order of floating windows (specifically `_NET_WM_STATE_ABOVE` and `_NET_WM_STATE_BELOW`). It ignores these hints and forces its own order.
-
-Effect: The `--bg` and `--fg` options do not work as intended (splashes will be permanently on the floating window layer). Splashes will never "disappear" behind tiled windows. Splashes will conflict with other floating windows too, and not stay above or below other windows.
-
-Problem: i3 does not seem to properly support the X shape extension.
-
-Effect: Disabling user input / hover focus for the window is non-standard (read: difficult), so the `--ni` flag will not work. For some reason, i3 decides that a window with no input area has its entire area instead be it's border, so dragging on a splash after setting the `--ni` flag will instead resize it in a wonky way.
-
-All other options work as intended. If you never use other floating windows and use splash just for overlays (with no click-through), the program works as intended.
-
-Currently this issue is *will not fix*, because it seems that it will require a substantial rewrite for a WM that does not follow the X spec. Consider forking and proposing a solution!
-
-Read the following discussion for possible fixes:
-
-https://github.com/weigert/splash/issues/7
-
-See also:
-
-https://github.com/i3/i3/issues/3265
+**splash wiki**: [window manager compatibility and system configuration](https://github.com/weigert/splash/wiki/Window-Manager-Configuration)
 
 ## Customization & How it Works
 
@@ -275,7 +223,6 @@ If there is a desire for more detailed information on how to build a custom visu
   - Plotting methods
   - .obj file load and display
   - Particle system
-- Dynamic data streams by active pipe listening
 
 ### Why?
 
