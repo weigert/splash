@@ -45,7 +45,8 @@ Program specific flags:
       text
 
       -ff [font]    Font face (searches in ~/.fonts/, default "arial.ttf")
-      -fc [hex]     Text color (hex code, e.g. 0xFFFFFF)
+      -fc [hex]     Font color (hex code, e.g. 0xFFFFFFFF, 0xFFFFFF, FFFFFF)
+      -bc [hex]     Background color (hex code, e.g. 0xFFFFFFFF, 0xFFFFFF, FFFFFF)
       -fs [size]    Font size, positive integer
       -v  [0,1,2]   Vertical Align [center, up, down]
       -h  [0,1,2]   Horizontal Align [center, left, right]

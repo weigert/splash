@@ -37,6 +37,8 @@ public:
 
   }
 
+  bool alive = true;
+
   svec* data;
   std::string ppipe;
   int fpipe;          //Pipe File Handle

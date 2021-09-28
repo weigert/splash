@@ -10,7 +10,8 @@ LINK = -lX11 -ldl -lXfixes -lXrender -lSDL2 -lSDL2_image -lSDL2_ttf -lgif -lGL -
 
 #Programs that are installable...
 #Note: Remove programs you do not wish to install!
-PROGRAMS = fidget img gif text hairy spiky
+#PROGRAMS = fidget img gif text hairy spiky
+PROGRAMS = text
 
 build:
 	# Make build directory

@@ -2,12 +2,34 @@
 #include <SDL2/SDL_ttf.h>
 #include <unistd.h>
 
+glm::vec4 hexparse(std::string s){
+
+  //Remove Leading 0x
+  if(s.substr(0,2) == "0x")
+    s = s.substr(2);
+
+  std::stringstream ss;
+  int val = 0;
+  glm::vec4 vec(0);
+
+  for(int i = 0; i < 4; i++){
+    if(s.empty()) break;
+    ss.clear();
+    ss << std::hex << s.substr(0,2);
+    ss >> val;
+    vec[i] = val;
+    s = s.substr(2);
+  }
+
+  return vec;
+}
+
 class Text : public Program {
 private:
 
   //Utility Classes
   Square2D flat;
-  Shader* shader;
+  Shader* shader = NULL;
   Texture* tex = NULL;
 
   int fontsize = 18;
@@ -15,8 +37,9 @@ private:
   int style;
 
   SDL_Color colorf;
-  glm::vec3 color = glm::vec3(0);
+  glm::vec4 color = glm::vec4(0,0,0,255);
   TTF_Font* font = NULL;
+  glm::vec4 bgcolor = glm::vec4(0,0,0,0);
 
   int halign = 0; //0 = center, 1 = left, 2 = right
   int valign = 0; //0 = center, 1 = up, 2 = down
@@ -72,7 +95,6 @@ private:
 
 public:
 
-
   //Constructor
   Text(svec* s, parse::data* d):Program(s){
 
@@ -81,16 +103,27 @@ public:
     //Font Size / Face
     if(d->pflags["-fs"]) fontsize = stoi(d->params["-fs0"]);
     if(d->pflags["-ff"]) fontface = d->params["-ff0"];
-    else logger::fatal("No font specified");
+    else{
+      std::cout<<"No Font Specified"<<std::endl;
+      alive = false;
+      return;
+    }
 
     //Open Font
     const char * home = getenv ("HOME");
-    if(home == NULL)
-      logger::fatal("Home environment variable not set");
+    if(home == NULL){
+      std::cout<<"Home Environment variable not set!"<<std::endl;
+      alive = false;
+      return;
+    }
     fs::path fp = fs::path(home);
 
     font = TTF_OpenFont((fp/".fonts"/fontface).string().c_str(), fontsize);
-    if(!font) logger::fatal("Couldn't open font");
+    if(!font){
+      std::cout<<"Couldn't open font! Not Found: "<<(fp/".fonts"/fontface).string()<<std::endl;
+      alive = false;
+      return;
+    }
 
     //Style Parameters
     style = TTF_STYLE_NORMAL;
@@ -102,14 +135,12 @@ public:
     TTF_SetFontStyle(font, style);
 
     //Extract Color
-    unsigned int x = 0;
-    std::stringstream ss;
-    if(d->pflags["-fc"]){
-      ss << std::hex << d->params["-fc0"];
-      ss >> x;
-    }
-    color = glm::vec3(x%256, (x/(256))%256, (x/(256*256))%256);
-    colorf = {color.x, color.y, color.z, 255};
+    if(d->pflags["-fc"])
+      color = hexparse(d->params["-fc0"]);
+    colorf = {color.x, color.y, color.z, color.w};
+
+    if(d->pflags["-bc"])
+      bgcolor = hexparse(d->params["-bc0"])/255.0f;
 
     //Vertical / Horizontal Alignment
     if(d->pflags["-v"]) valign = stoi(d->params["-v0"]);
@@ -128,9 +159,9 @@ public:
   virtual void pipeline(){
     if(tex == NULL) return;
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
     shader->use();
     shader->uniform("model", model);
+    shader->uniform("bgcolor", bgcolor);
     shader->texture("imageTexture", *tex);
     flat.render();
   }
@@ -144,8 +175,9 @@ public:
   }
 
   ~Text(){
-    delete shader, tex;
-    TTF_CloseFont(font);
+    if(shader != NULL)  delete shader;
+    if(tex != NULL)     delete tex;
+    if(font != NULL)    TTF_CloseFont(font);
     TTF_Quit();
   }
 };

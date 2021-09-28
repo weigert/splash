@@ -5,10 +5,14 @@ in vec2 ex_Tex;
 out vec4 fragColor;
 
 uniform sampler2D imageTexture;
+uniform vec4 bgcolor;
 
 void main(){
-  fragColor = texture(imageTexture, ex_Tex);
-  if(fragColor.a == 0.0) discard;//fragColor = vec4(0.0, 0.0, 0.0, 0.5);//discard;
+
+  fragColor = vec4(bgcolor);
+  vec4 texcolor = texture(imageTexture, ex_Tex);
+  fragColor = mix(fragColor, texcolor, texcolor.a);
+
 }
 
 )""

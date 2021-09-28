@@ -1,7 +1,7 @@
 # splash
 Unix Splash Screen Tool - turn your desktop into a 2D / 3D canvas
 
-Made in C++
+Made in C/C++ + XLIB
 
 See below for distro / DE compatbility
 
