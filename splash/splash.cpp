@@ -37,7 +37,7 @@ int main( int argc, char* args[] ) {
 
 	signal(SIGINT, &sighandler);
 
-	while(event::active){
+	while(event::active && p->alive){
 
 		event::input(splash);
 
