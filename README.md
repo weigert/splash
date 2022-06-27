@@ -226,7 +226,7 @@ If there is a desire for more detailed information on how to build a custom visu
 
 ### Why?
 
-¯\_(ツ)_/¯
+¯\\\_(ツ)\_/¯
 
 *check out my dope desktop fidget spinner, man*
 
